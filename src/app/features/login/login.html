@@ -1,0 +1,33 @@
+<div class="p-8 mt-20">
+    <h1 class="text-3xl font-bold mb-6 text-center">Iniciar Sesión</h1>
+
+    <div class="flex flex-col gap-4">
+        <input
+            type="text"
+            placeholder="Usuario"
+            [(ngModel)]="username"
+            class="border border-gray-300 rounded-lg p-3 outline-none"
+        />
+
+        <input
+            type="password"
+            placeholder="Contraseña"
+            [(ngModel)]="password"
+            class="border border-gray-300 rounded-lg p-3 outline-none"
+        />
+
+        <button
+            (click)="login()"
+            class="bg-red-500 hover:bg-red-300 text-white rounded-lg p-3 text-[1rem]"
+        >
+            Iniciar Sesión
+        </button>
+        @if(errorMessage()){
+
+        <div class="bg-red-100 text-red-600 p-3 rounded-lg">
+            Usuario o contraseña incorrectos
+        </div>
+
+        }
+    </div>
+</div>

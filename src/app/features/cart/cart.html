@@ -1,0 +1,18 @@
+<div class="mt-20">
+    <div class="grid grid-cols-1 gap-6 px-8 py-10">
+        @for(product of products; track product.id) {
+
+        <app-product-cart [product]="product" />
+
+        }
+        <button
+            (click)="generateQuotation()"
+            class="flex justify-center items-center gap-1 text-[1.4rem] bg-red-500 hover:bg-red-300 active:bg-red-300 text-white rounded-lg p-2"
+        >
+            <mat-icon class="text-3xl! h-auto! w-auto!"
+                >insert_drive_file</mat-icon
+            >
+            <span>Generar cotizacion</span>
+        </button>
+    </div>
+</div>

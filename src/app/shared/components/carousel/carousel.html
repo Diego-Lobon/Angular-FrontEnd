@@ -1,0 +1,75 @@
+<div
+    class="relative w-full max-w-4xl mx-auto h-112.5 overflow-hidden shadow-lg group"
+    (mouseenter)="stopAutoPlay()"
+    (mouseleave)="startAutoPlay()"
+>
+    <!-- CONTENEDOR DE IMÁGENES -->
+    <div
+        class="flex h-full transition-transform duration-500 ease-out"
+        [style.transform]="'translateX(-' + (currentIndex * 100) + '%)'"
+    >
+        @for (img of images; track $index) {
+        <div class="w-full h-full shrink-0">
+            <img [src]="img" alt="Banner" class="w-full h-full object-cover" />
+        </div>
+        }
+    </div>
+
+    <!-- FLECHA IZQUIERDA -->
+    <button
+        (click)="prevSlide()"
+        class="absolute top-1/2 left-4 -translate-y-1/2 bg-black/30 hover:bg-black/60 text-white p-2 rounded-full transition-all opacity-100"
+    >
+        <svg
+            xmlns="http://w3.org"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="2.5"
+            stroke="currentColor"
+            class="w-6 h-6"
+        >
+            <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M15.75 19.5L8.25 12l7.5-7.5"
+            />
+        </svg>
+    </button>
+
+    <!-- FLECHA DERECHA -->
+    <button
+        (click)="nextSlide()"
+        class="absolute top-1/2 right-4 -translate-y-1/2 bg-black/30 hover:bg-black/60 text-white p-2 rounded-full transition-all opacity-100"
+    >
+        <svg
+            xmlns="http://w3.org"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="2.5"
+            stroke="currentColor"
+            class="w-6 h-6"
+        >
+            <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M8.25 4.5l7.5 7.5-7.5 7.5"
+            />
+        </svg>
+    </button>
+
+    <!-- PUNTOS INDICADORES (BOTONES INFERIORES) -->
+    <div
+        class="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-10 bg-black/20 px-3 py-1.5 rounded-full backdrop-blur-sm"
+    >
+        @for (img of images; track $index) {
+        <button
+            (click)="goToSlide($index)"
+            class="h-3 rounded-full transition-all duration-300"
+            [ngClass]="{
+          'bg-white w-6': currentIndex === $index,
+          'bg-white/50 w-3 hover:bg-white/80': currentIndex !== $index
+        }"
+        ></button>
+        }
+    </div>
+</div>

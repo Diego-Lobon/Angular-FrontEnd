@@ -1,0 +1,85 @@
+<nav
+    class="fixed top-0 left-0 w-full bg-white flex justify-between px-6 py-2 shadow-[0_4px_6px_-1px_rgba(0,0,0,0.1)]"
+>
+    <img
+        routerLink="/"
+        class="h-16"
+        src="assets/logos/logo-isur.png"
+        alt="Logo-ISUR"
+    />
+    <div class="flex gap-3 header-responsive-button">
+        <a class="m-auto" routerLink="/cotizar">
+            <mat-icon class="text-3xl! w-auto! h-auto! text-red-600!"
+                >shopping_cart</mat-icon
+            >
+        </a>
+        <button
+            (click)="toggleMenu()"
+            id="menu-btn"
+            class="m-auto w-10 hover:bg-gray-200 active:bg-gray-200 rounded-[0.2rem]"
+        >
+            <mat-icon class="text-3xl! w-auto! h-auto!">menu</mat-icon>
+        </button>
+    </div>
+</nav>
+
+<!-- OVERLAY -->
+
+@if(isMenuOpen) {
+
+<div class="fixed inset-0 bg-black/40 z-40" (click)="closeMenu()"></div>
+
+}
+
+<!-- SIDEBAR -->
+
+<div
+    class="fixed top-0 right-0 h-screen w-72 bg-white z-50 p-6 transition-transform duration-300"
+    [class.translate-x-full]="!isMenuOpen"
+    [class.translate-x-0]="isMenuOpen"
+    [class.shadow-2xl]="isMenuOpen"
+>
+    <!-- HEADER -->
+
+    <div class="flex justify-between items-center mb-10">
+        <h2 class="text-2xl font-bold">Menú</h2>
+
+        <button
+            (click)="closeMenu()"
+            class="flex items-center justify-center w-10 h-10 rounded-md hover:bg-gray-200 active:bg-gray-300"
+        >
+            <mat-icon> close </mat-icon>
+        </button>
+    </div>
+
+    <!-- LINKS -->
+
+    <div class="flex flex-col gap-6 text-lg">
+        <a routerLink="/" (click)="closeMenu()"> Inicio </a>
+
+        <a routerLink="/productos" (click)="closeMenu()"> Productos </a>
+
+        <a routerLink="/cotizar" (click)="closeMenu()"> Cotización </a>
+
+        @if(authService.isLoggedIn()){
+
+        <button
+            (click)="closeMenu(); logout()"
+            class="bg-black text-white rounded-[0.4rem] p-1 text-center hover:bg-gray-500 active:bg-gray-500"
+        >
+            Cerrar Sesión
+        </button>
+
+        } @else {
+
+        <a
+            routerLink="/login"
+            (click)="closeMenu()"
+            class="bg-black text-white rounded-[0.4rem] p-1 text-center hover:bg-gray-500 active:bg-gray-500"
+        >
+            Iniciar Sesión
+        </a>
+
+        }
+    </div>
+</div>
