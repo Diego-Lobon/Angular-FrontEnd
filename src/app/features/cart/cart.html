@@ -12,7 +12,23 @@
             <mat-icon class="text-3xl! h-auto! w-auto!"
                 >insert_drive_file</mat-icon
             >
-            <span>Generar cotizacion</span>
+            <span>Visualizar cotizacion</span>
+        </button>
+        <button
+            (click)="generateQuotationValid()"
+            class="flex justify-center items-center gap-1 text-[1.4rem] bg-green-500 hover:bg-green-300 active:bg-green-300 text-white rounded-lg p-2"
+        >
+            <mat-icon class="text-3xl! h-auto! w-auto!"
+                >insert_drive_file</mat-icon
+            >
+            <span>Enviar cotizacion</span>
+        </button>
+        <button
+            (click)="downloadQuotation()"
+            class="flex justify-center items-center gap-1 text-[1.4rem] bg-blue-500 hover:bg-blue-300 active:bg-blue-300 text-white rounded-lg p-2"
+        >
+            <mat-icon class="text-3xl! h-auto! w-auto!"> download </mat-icon>
+            <span>Descargar cotización</span>
         </button>
     </div>
 </div>

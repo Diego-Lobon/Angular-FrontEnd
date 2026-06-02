@@ -10,10 +10,11 @@ import { QuotationService } from '../../core/services/quotation.service';
     styleUrl: './cart.css',
 })
 export class Cart {
-    // ! PRODUCTOS DE PRUEBA
+    // * PRODUCTOS DE PRUEBA
     products = [
         {
             id: 1,
+            ref: '50003067',
             name: 'Guantes Industriales',
             marca: 'MSA',
             category: 'Seguridad',
@@ -24,6 +25,7 @@ export class Cart {
 
         {
             id: 2,
+            ref: '50004897',
             name: 'Casco de Seguridad',
             marca: '3M',
             category: 'Protección',
@@ -41,5 +43,36 @@ export class Cart {
 
             window.open(url);
         });
+    }
+
+    generateQuotationValid() {
+        this.quotationService
+            .generatePdfValid(this.products)
+            .subscribe((blob) => {
+                // Vista previa
+                const url = window.URL.createObjectURL(blob);
+                window.open(url);
+            });
+    }
+
+    downloadQuotation() {
+        this.quotationService
+            .generatePdfValid(this.products)
+            .subscribe((blob) => {
+                const url = window.URL.createObjectURL(blob);
+
+                const link = document.createElement('a');
+
+                link.href = url;
+                link.download = 'cotizacion.pdf';
+
+                document.body.appendChild(link);
+
+                link.click();
+
+                document.body.removeChild(link);
+
+                window.URL.revokeObjectURL(url);
+            });
     }
 }

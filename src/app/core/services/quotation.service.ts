@@ -20,4 +20,15 @@ export class QuotationService {
             },
         );
     }
+
+    generatePdfValid(products: any[]) {
+
+        return this.http.post(
+            `${this.apiUrl}/quotation/pdf-valid`,
+            { products },
+            {
+                responseType: 'blob',
+            },
+        );
+    }
 }

@@ -9,20 +9,21 @@ export const authGuard: CanActivateFn = () => {
 
     const router = inject(Router);
 
-    // SI NO ES NAVEGADOR
+    // * SI NO ES NAVEGADOR
 
     if (!isPlatformBrowser(platformId)) {
         return false;
     }
 
-    // TOKEN
-
+    // * Obtener token
     const token = localStorage.getItem('token');
 
+    // * Verifica la existencia del token
     if (token) {
         return true;
     }
 
+    // * Si no existe el token, nos llevara al login
     router.navigate(['/login']);
 
     return false;
