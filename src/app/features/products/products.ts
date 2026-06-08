@@ -13,7 +13,7 @@ import { isPlatformBrowser } from '@angular/common';
 import { Product } from '../../core/interfaces/product.interface';
 import { CategoriesService } from '../../core/services/categories.service';
 import { MatIcon } from '@angular/material/icon';
-import { Navpage } from '../../shared/navpage/navpage';
+import { Navpage } from '../../shared/components/navpage/navpage';
 
 @Component({
     selector: 'app-products',

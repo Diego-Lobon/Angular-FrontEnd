@@ -8,7 +8,7 @@ import {
 } from '../../core/services/cart-redis.service';
 import { CommonModule } from '@angular/common';
 import { Subscription } from 'rxjs';
-import { Navpage } from '../../shared/navpage/navpage';
+import { Navpage } from '../../shared/components/navpage/navpage';
 
 @Component({
     selector: 'app-cart',
