@@ -1,34 +1,65 @@
-<div class="mt-20">
-    <div class="grid grid-cols-1 gap-6 px-8 py-10">
-        @for(product of products; track product.id) {
+<div
+    class="mt-20 max-w-2xl mx-auto px-4 py-10 relative flex flex-col min-h-screen"
+>
+    <app-navpage />
+    <div class="flex flex-col gap-1 mb-6">
+        <h2 class="text-2xl text-gray-700 font-bold">Carrito de compras</h2>
+        <span class="text-[1rem]"
+            >Revisa los productos que has seleccionado y solicita una cotización
+            personalizada.</span
+        >
+    </div>
 
-        <app-product-cart [product]="product" />
+    <div class="grid grid-cols-1 gap-6 mb-6">
+        @for(item of (cartRedisService.cartItems$ | async); track
+        item.productId) {
 
+        <app-product-cart
+            [product]="{ 
+                id: item.productId,
+                referencia_interna: item.referencia_interna, 
+                nombre: item.name, 
+                precio: item.price, 
+                cantidad: item.cantidad, 
+                imagen_url: item.imageUrl,
+                marca: item.marca,
+                categoria: { nombre: item.categoria?.nombre }
+            }"
+        />
+
+        } @if((cartRedisService.cartItems$ | async)?.length === 0){
+        <div class="text-center text-2xl text-gray-500 py-10">
+            No hay productos en el carrito
+        </div>
         }
+    </div>
+
+    @if(((cartRedisService.cartItems$ | async) ?? []).length > 0) {
+    <div
+        class="sticky bottom-4 z-30 mt-auto flex flex-col gap-2 border border-gray-300 rounded-2xl p-6 bg-white/95 backdrop-blur-md shadow-[0_-8px_30px_rgb(0,0,0,0.12)]"
+    >
+        <div class="flex justify-between items-center mb-2 px-1">
+            <span class="text-gray-600 font-medium">Total estimado:</span>
+            <span class="text-xl font-bold text-gray-900"
+                >{{ cartRedisService.getCartTotal() | async | currency:'USD'
+                }}</span
+            >
+        </div>
+
         <button
             (click)="generateQuotation()"
-            class="flex justify-center items-center gap-1 text-[1.4rem] bg-red-500 hover:bg-red-300 active:bg-red-300 text-white rounded-lg p-2"
+            class="flex justify-center items-center gap-1 w-full text-white bg-red-500 hover:bg-red-600 active:bg-red-700 rounded-lg p-2.5 transition-colors"
         >
-            <mat-icon class="text-3xl! h-auto! w-auto!"
-                >insert_drive_file</mat-icon
-            >
-            <span>Visualizar cotizacion</span>
-        </button>
-        <button
-            (click)="generateQuotationValid()"
-            class="flex justify-center items-center gap-1 text-[1.4rem] bg-green-500 hover:bg-green-300 active:bg-green-300 text-white rounded-lg p-2"
-        >
-            <mat-icon class="text-3xl! h-auto! w-auto!"
-                >insert_drive_file</mat-icon
-            >
-            <span>Enviar cotizacion</span>
+            <mat-icon class="text-2xl">insert_drive_file</mat-icon>
+            <span class="text-lg font-medium">Visualizar cotización</span>
         </button>
         <button
             (click)="downloadQuotation()"
-            class="flex justify-center items-center gap-1 text-[1.4rem] bg-blue-500 hover:bg-blue-300 active:bg-blue-300 text-white rounded-lg p-2"
+            class="flex justify-center items-center gap-1 w-full text-white bg-blue-500 hover:bg-blue-600 active:bg-blue-700 rounded-lg p-2.5 transition-colors"
         >
-            <mat-icon class="text-3xl! h-auto! w-auto!"> download </mat-icon>
-            <span>Descargar cotización</span>
+            <mat-icon class="text-2xl">download</mat-icon>
+            <span class="text-lg font-medium">Descargar cotización</span>
         </button>
     </div>
+    }
 </div>

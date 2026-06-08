@@ -1,9 +1,75 @@
-<div class="mt-20">
-    <div class="grid grid-cols-1 gap-6 px-8 py-10">
-        @for(product of products; track product.id) {
+<div class="mt-30">
+    <div class="flex flex-col gap-3 px-4">
+        <app-navpage />
+        <div class="flex flex-col gap-1 mb-2">
+            <h2 class="text-2xl text-gray-700 font-bold">Productos</h2>
+            <span class="text-[1rem]"
+                >Explora, filtra y encuentra lo que necesitas.</span
+            >
+        </div>
+        <input
+            type="text"
+            placeholder="Buscar producto..."
+            class="border p-4 rounded w-full text-[1rem]"
+            (input)="searchTerm.set($any($event.target).value); currentPage.set(1)"
+        />
+        <select
+            class="border p-4 rounded w-full text-[1rem]"
+            (change)="selectedCategory1.set($any($event.target).value); currentPage.set(1)"
+        >
+            <option value="">Todas las categorías</option>
+            @for(category of categories(); track category.id){
+            <option [value]="category.id">{{ category.nombre }}</option>
+            }
+        </select>
+    </div>
 
+    <div
+        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 px-4 py-10"
+    >
+        @for(product of paginatedProducts(); track product.id) {
         <app-product-card [product]="product" />
-
+        } @if(filteredProducts().length === 0){
+        <div class="text-center text-gray-500 text-xl col-span-full py-10">
+            No se encontraron productos
+        </div>
         }
     </div>
+
+    @if(totalPages() > 1) {
+    <div
+        class="flex justify-center items-center gap-1 w-full max-w-lg mx-auto pb-12 px-4"
+    >
+        <button
+            (click)="goToPage(currentPage() - 1)"
+            [disabled]="currentPage() === 1"
+            class="flex items-center justify-center min-w-10 h-10 rounded-lg border border-gray-300 disabled:opacity-30 disabled:hover:bg-transparent hover:bg-gray-100 transition-colors bg-white z-10"
+        >
+            <mat-icon>chevron_left</mat-icon>
+        </button>
+
+        <div
+            class="flex items-center gap-1.5 overflow-x-auto px-2 py-1 scroll-smooth max-w-full mask-edges"
+        >
+            @for(page of pageNumbers(); track page) {
+            <button
+                (click)="goToPage(page)"
+                [class]="currentPage() === page 
+                        ? 'min-w-10 h-10 px-3 rounded-lg bg-black text-white font-medium shadow-sm shrink-0' 
+                        : 'min-w-10 h-10 px-3 rounded-lg border border-gray-300 hover:bg-gray-100 transition-colors text-gray-700 bg-white shrink-0'"
+            >
+                {{ page }}
+            </button>
+            }
+        </div>
+
+        <button
+            (click)="goToPage(currentPage() + 1)"
+            [disabled]="currentPage() === totalPages()"
+            class="flex items-center justify-center min-w-10 h-10 rounded-lg border border-gray-300 disabled:opacity-30 disabled:hover:bg-transparent hover:bg-gray-100 transition-colors bg-white z-10"
+        >
+            <mat-icon>chevron_right</mat-icon>
+        </button>
+    </div>
+    }
 </div>

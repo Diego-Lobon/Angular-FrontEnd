@@ -1,5 +1,5 @@
 <nav
-    class="fixed top-0 left-0 w-full bg-white flex justify-between px-6 py-2 shadow-[0_4px_6px_-1px_rgba(0,0,0,0.1)]"
+    class="fixed top-0 left-0 w-full z-40 bg-white flex justify-between px-6 py-2 shadow-[0_4px_6px_-1px_rgba(0,0,0,0.1)]"
 >
     <img
         routerLink="/"
@@ -34,7 +34,7 @@
 <!-- SIDEBAR -->
 
 <div
-    class="fixed top-0 right-0 h-screen w-72 bg-white z-50 p-6 transition-transform duration-300"
+    class="fixed top-0 right-0 h-screen w-72 bg-white z-60 p-6 transition-transform duration-300"
     [class.translate-x-full]="!isMenuOpen"
     [class.translate-x-0]="isMenuOpen"
     [class.shadow-2xl]="isMenuOpen"
@@ -62,7 +62,9 @@
         <a routerLink="/cotizar" (click)="closeMenu()"> Cotización </a>
 
         @if(authService.isLoggedIn()){
-
+        <a routerLink="/valid-cotizacion" (click)="closeMenu()">
+            Validar Cotización
+        </a>
         <button
             (click)="closeMenu(); logout()"
             class="bg-black text-white rounded-[0.4rem] p-1 text-center hover:bg-gray-500 active:bg-gray-500"

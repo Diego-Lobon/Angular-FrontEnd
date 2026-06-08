@@ -17,7 +17,7 @@ export class AuthService {
     // * Obtiene información del entorno actual
     private platformId = inject(PLATFORM_ID);
     // * URL del backend
-    private apiUrl = 'http://192.168.18.36:3000';
+    private apiUrl = 'http://192.168.18.38:3000';
 
     // * Angular inyecta automáticamente HttpClient
     constructor(private http: HttpClient) {}

@@ -3,16 +3,18 @@
 >
     <img
         class="w-min m-auto"
-        [src]="product.image"
+        [src]="product?.imagen_url || 'assets/products/product-void.jpeg'"
         (error)="onImageError($event)"
     />
     <div class="flex flex-col gap-1.5">
-        <span class="text-2xl text-gray-600">{{ product.name }}</span>
+        <span class="text-2xl text-gray-600">{{ product.nombre }}</span>
+
         <div class="flex gap-1 text-[1rem]">
-            <span>{{ product.marca }}</span>
+            <span>{{ product.marca || 'Genérico' }}</span>
             <span>-</span>
-            <span>{{ product.category }}</span>
+            <span>{{ product?.categoria?.nombre || 'Sin categoría' }}</span>
         </div>
+
         <div class="flex justify-between mt-2">
             <div class="flex gap-1 items-center">
                 <span class="text-[1rem]">Cantidad: </span>
@@ -33,6 +35,7 @@
                 </div>
             </div>
             <button
+                (click)="removeProduct()"
                 class="flex justify-center items-center bg-red-500 hover:bg-red-300 active:bg-red-300 rounded-[0.4rem] px-1.5"
             >
                 <mat-icon class="text-white! text-3xl! w-auto! h-auto!"

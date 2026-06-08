@@ -6,7 +6,6 @@ import { Login } from './features/login/login';
 import { authGuard } from './core/guards/auth-guard';
 import { Products } from './features/products/products';
 import { ValidCotizacion } from './features/valid-cotizacion/valid-cotizacion';
-//import { CartComponent } from './features/cart/cart';
 
 export const routes: Routes = [
     {
@@ -32,11 +31,6 @@ export const routes: Routes = [
     {
         path: 'valid-cotizacion',
         component: ValidCotizacion,
-    },
-
-    {
-        path: 'cart',
-        component: Cart,
         canActivate: [authGuard],
     },
 ];
