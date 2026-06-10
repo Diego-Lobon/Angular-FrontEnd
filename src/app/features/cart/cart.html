@@ -19,7 +19,8 @@
                 id: item.productId,
                 referencia_interna: item.referencia_interna, 
                 nombre: item.name, 
-                precio: item.price, 
+                precio_dolar: item.price_dolares,
+                precio_soles: item.price_soles, 
                 cantidad: item.cantidad, 
                 imagen_url: item.imageUrl,
                 marca: item.marca,
@@ -39,10 +40,9 @@
         class="sticky bottom-4 z-30 mt-auto flex flex-col gap-2 border border-gray-300 rounded-2xl p-6 bg-white/95 backdrop-blur-md shadow-[0_-8px_30px_rgb(0,0,0,0.12)]"
     >
         <div class="flex justify-between items-center mb-2 px-1">
-            <span class="text-gray-600 font-medium">Total estimado:</span>
+            <span class="text-gray-600 font-medium">Cantidad de productos:</span>
             <span class="text-xl font-bold text-gray-900"
-                >{{ cartRedisService.getCartTotal() | async | currency:'USD'
-                }}</span
+                >{{ cartRedisService.getCartCount() | async}}</span
             >
         </div>
 

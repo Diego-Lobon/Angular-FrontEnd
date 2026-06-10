@@ -1,43 +1,49 @@
-<div class="mt-30">
-    <div class="flex flex-col gap-3 px-4">
-        <app-navpage />
-        <div class="flex flex-col gap-1 mb-2">
-            <h2 class="text-2xl text-gray-700 font-bold">Productos</h2>
-            <span class="text-[1rem]"
-                >Explora, filtra y encuentra lo que necesitas.</span
+<div class="mt-16 px-4 py-6 bg-gray-50 min-h-screen">
+    <!-- * Titulo y cantidad -->
+    <div class="max-w-md mx-auto">
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-xl font-bold text-gray-800">Lista de Productos</h2>
+            <span
+                class="bg-black text-white text-xs font-semibold px-2.5 py-1 rounded-full"
             >
+                2 Productos
+            </span>
         </div>
+    </div>
+
+    <!-- * Filtros del producto -->
+    <div class="flex flex-col gap-3">
         <input
             type="text"
             placeholder="Buscar producto..."
-            class="border p-4 rounded w-full text-[1rem]"
+            class="border p-4 rounded-4xl w-full text-[1rem] bg-white border-gray-400"
             (input)="searchTerm.set($any($event.target).value); currentPage.set(1)"
         />
-        <select
-            class="border p-4 rounded w-full text-[1rem]"
-            (change)="selectedCategory.set($any($event.target).value); currentPage.set(1)"
-        >
-            <option value="">Todas las categorías</option>
-            @for(category of categories(); track category.id){
-            <option [value]="category.id">{{ category.nombre }}</option>
-            }
-        </select>
-        <select
-            class="border p-4 rounded w-full text-[1rem]"
-            (change)="selectedMarca.set($any($event.target).value); currentPage.set(1)"
-        >
-            <option value="">Todas las marcas</option>
-            @for(marca of marcas(); track marca.id){
-            <option [value]="marca.id">{{ marca.nombre }}</option>
-            }
-        </select>
+        <div class="flex gap-2">
+            <select
+                class="border p-2 rounded w-full text-[0.9rem] border-gray-400 bg-white"
+                (change)="selectedCategory.set($any($event.target).value); currentPage.set(1)"
+            >
+                <option value="">Todas las categorías</option>
+                @for(category of categories(); track category.id){
+                <option [value]="category.id">{{ category.nombre }}</option>
+                }
+            </select>
+            <select
+                class="border p-2 rounded w-full text-[0.9rem] border-gray-400 bg-white"
+                (change)="selectedMarca.set($any($event.target).value); currentPage.set(1)"
+            >
+                <option value="">Todas las marcas</option>
+                @for(marca of marcas(); track marca.id){
+                <option [value]="marca.id">{{ marca.nombre }}</option>
+                }
+            </select>
+        </div>
     </div>
 
-    <div
-        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 px-4 py-10"
-    >
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 py-4">
         @for(product of paginatedProducts(); track product.id) {
-        <app-product-card [product]="product" />
+        <app-admin-product-card [product]="product" />
         } @if(filteredProducts().length === 0){
         <div class="text-center text-gray-500 text-xl col-span-full py-10">
             No se encontraron productos

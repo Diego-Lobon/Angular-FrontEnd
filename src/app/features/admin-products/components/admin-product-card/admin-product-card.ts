@@ -1,23 +1,19 @@
-import { Component, Input, inject } from '@angular/core';
-import { MatIcon } from '@angular/material/icon';
-// 💡 IMPORTANTE: Asegúrate de importar AsyncPipe además de CommonModule
-import { CommonModule, AsyncPipe } from '@angular/common';
+import { Component, inject, Input } from '@angular/core';
 import {
-    CartRedisService,
     CartItem,
-} from '../../../core/services/cart-redis.service';
-import { Product } from '../../../core/interfaces/product.interface';
+    CartRedisService,
+} from '../../../../core/services/cart-redis.service';
+import { Product } from '../../../../core/interfaces/product.interface';
 import { map } from 'rxjs';
+import { MatIcon } from '@angular/material/icon';
 
 @Component({
-    selector: 'app-product-card',
-    standalone: true,
-    // 💡 AGREGAMOS AsyncPipe AQUÍ
-    imports: [CommonModule, AsyncPipe, MatIcon],
-    templateUrl: './product-card.html',
-    styleUrl: './product-card.css',
+    selector: 'app-admin-product-card',
+    imports: [MatIcon],
+    templateUrl: './admin-product-card.html',
+    styleUrl: './admin-product-card.css',
 })
-export class ProductCard {
+export class AdminProductCard {
     public cartRedisService = inject(CartRedisService);
 
     @Input() product!: Product;

@@ -1,0 +1,114 @@
+<div class="mt-20 px-4 py-6 bg-gray-50 min-h-screen">
+    <div
+        class="max-w-md mx-auto bg-white p-5 rounded-2xl shadow-sm border border-gray-100"
+    >
+        <h2 class="text-xl font-bold text-gray-800 mb-6 text-center">
+            Configurar Aplicación
+        </h2>
+
+        <form class="flex flex-col gap-6">
+            <div
+                class="flex flex-col gap-3 bg-gray-50 p-4 rounded-xl border border-gray-200/60"
+            >
+                <label class="text-sm font-semibold text-gray-700 mb-1"
+                    >¿A quién se aplica?</label
+                >
+
+                <label
+                    class="flex items-center gap-3 p-3 bg-white rounded-lg border border-gray-200 active:bg-gray-100 transition-colors cursor-pointer"
+                >
+                    <input
+                        type="radio"
+                        name="clientSelection"
+                        value="tipo"
+                        [(ngModel)]="tipoSeleccion"
+                        class="w-5 h-5 text-black focus:ring-black"
+                    />
+                    <span class="text-sm text-gray-800 font-medium"
+                        >Por Tipo de Cliente</span
+                    >
+                </label>
+
+                <label
+                    class="flex items-center gap-3 p-3 bg-white rounded-lg border border-gray-200 active:bg-gray-100 transition-colors cursor-pointer"
+                >
+                    <input
+                        type="radio"
+                        name="clientSelection"
+                        value="especifico"
+                        [(ngModel)]="tipoSeleccion"
+                        class="w-5 h-5 text-black focus:ring-black"
+                    />
+                    <span class="text-sm text-gray-800 font-medium"
+                        >Un Cliente en Específico</span
+                    >
+                </label>
+
+                @if (tipoSeleccion === 'tipo') {
+                <div class="mt-2 animate-fadeIn">
+                    <label class="text-xs font-medium text-gray-500 block mb-1"
+                        >Selecciona el Tipo:</label
+                    >
+                    <select
+                        class="w-full bg-white border border-gray-300 rounded-lg p-3 text-sm focus:outline-none focus:border-black"
+                    >
+                        <option value="">-- Seleccionar Tipo --</option>
+                        <option value="mayorista">Contrata</option>
+                        <option value="minorista">Sub Distribuidor</option>
+                        <option value="vip">Publico General</option>
+                    </select>
+                </div>
+                } @if (tipoSeleccion === 'especifico') {
+                <div class="mt-2 animate-fadeIn">
+                    <label class="text-xs font-medium text-gray-500 block mb-1"
+                        >Buscar Cliente:</label
+                    >
+                    <select
+                        class="w-full bg-white border border-gray-300 rounded-lg p-3 text-sm focus:outline-none focus:border-black"
+                    >
+                        <option value="">-- Seleccionar Cliente --</option>
+                        <option value="1">Juan Pérez (RUC: 1045...)</option>
+                        <option value="2">Distribuidora Norte S.A.C.</option>
+                        <option value="3">María Gómez</option>
+                    </select>
+                </div>
+                }
+            </div>
+
+            
+
+            <div class="flex flex-col gap-1">
+                <label class="text-sm font-semibold text-gray-700 mb-1"
+                    >Aplicar a la Marca</label
+                >
+                <div class="grid grid-cols-3 gap-2">
+                    <select
+                        class="col-span-2 bg-white border border-gray-300 rounded-lg p-3 text-sm focus:outline-none focus:border-black"
+                    >
+                        <option value="">-- Marca --</option>
+                        <option value="sony">MSA</option>
+                        <option value="samsung">DELTAPLUS</option>
+                    </select>
+                    <div class="relative flex items-center">
+                        <input
+                            type="number"
+                            placeholder="0"
+                            class="w-full border border-gray-300 rounded-lg p-3 text-sm pr-6 text-center focus:outline-none focus:border-black"
+                        />
+                        <span class="absolute right-2 text-gray-400 text-sm"
+                            >%</span
+                        >
+                    </div>
+                </div>
+            </div>
+
+            <button
+                type="button"
+                (click)="aplicarConfiguracion()"
+                class="w-full bg-black text-white font-semibold text-base p-4 rounded-xl shadow-md hover:bg-gray-900 active:scale-[0.98] transition-all mt-4 text-center"
+            >
+                Aplicar Cambios
+            </button>
+        </form>
+    </div>
+</div>

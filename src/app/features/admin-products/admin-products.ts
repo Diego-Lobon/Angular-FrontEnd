@@ -1,29 +1,26 @@
 import {
     Component,
     signal,
-    computed,
     inject,
     PLATFORM_ID,
-    OnInit,
+    computed,
+    Signal,
 } from '@angular/core';
-
-import { ProductCard } from '../../shared/components/product-card/product-card';
-import { ProductsService } from '../../core/services/products';
-import { isPlatformBrowser } from '@angular/common';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { MatIconModule } from '@angular/material/icon';
 import { Product } from '../../core/interfaces/product.interface';
 import { CategoriesService } from '../../core/services/categories.service';
-import { MatIcon } from '@angular/material/icon';
-import { Navpage } from '../../shared/components/navpage/navpage';
 import { MarcasService } from '../../core/services/marcas.service';
+import { ProductsService } from '../../core/services/products';
+import { AdminProductCard } from './components/admin-product-card/admin-product-card';
 
 @Component({
-    selector: 'app-products',
-    standalone: true,
-    imports: [ProductCard, MatIcon, Navpage],
-    templateUrl: './products.html',
-    styleUrl: './products.css',
+    selector: 'app-admin-products',
+    imports: [CommonModule, MatIconModule, AdminProductCard],
+    templateUrl: './admin-products.html',
+    styleUrl: './admin-products.css',
 })
-export class Products implements OnInit {
+export class AdminProducts {
     private categoriesService = inject(CategoriesService);
     private marcasService = inject(MarcasService);
     private productsService = inject(ProductsService);

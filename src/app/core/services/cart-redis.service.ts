@@ -6,10 +6,13 @@ export interface CartItem {
     referencia_interna: string;
     productId: string;
     name: string;
-    price: number;
+    price_dolares: number;
+    price_soles: number;
     cantidad: number;
     imageUrl?: string;
-    marca?: string;
+    marca?: {
+        nombre: string;
+    };
     categoria?: {
         nombre: string;
     };
@@ -174,10 +177,16 @@ export class CartRedisService {
         return this.cartItems$.pipe(
             map((items) =>
                 items.reduce(
-                    (acc, item) => acc + item.price * item.cantidad,
+                    (acc, item) => acc + item.price_soles * item.cantidad,
                     0,
                 ),
             ),
+        );
+    }
+
+    getCartCount(): Observable<number> {
+        return this.cartItems$.pipe(
+            map((items) => items.reduce((acc, item) => acc + item.cantidad, 0)),
         );
     }
 }

@@ -45,7 +45,7 @@ export class Login {
                 console.log('LOGIN OK');
 
                 // * Redirigir
-                this.router.navigate(['/']);
+                this.router.navigate(['/admin-dashboard']);
             },
             // * error se ejecuta si encuentra algun problema
             error: () => {
