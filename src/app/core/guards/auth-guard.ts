@@ -1,30 +1,26 @@
 import { inject, PLATFORM_ID } from '@angular/core';
-
 import { isPlatformBrowser } from '@angular/common';
-
 import { CanActivateFn, Router } from '@angular/router';
 
-export const authGuard: CanActivateFn = () => {
+export const authAdminGuard: CanActivateFn = () => {
     const platformId = inject(PLATFORM_ID);
-
     const router = inject(Router);
 
-    // * SI NO ES NAVEGADOR
-
+    // 1. Si no es el navegador (es decir, es el Servidor/SSR), permitimos el paso temporal.
+    // Esto evita que el servidor rompa la petición y tire el "Cannot GET".
     if (!isPlatformBrowser(platformId)) {
-        return false;
-    }
-
-    // * Obtener token
-    const token = localStorage.getItem('token');
-
-    // * Verifica la existencia del token
-    if (token) {
         return true;
     }
 
-    // * Si no existe el token, nos llevara al login
-    router.navigate(['/login']);
+    // 2. Ya en el navegador, hacemos la validación real con el localStorage
+    const adminToken = localStorage.getItem('admin_token');
 
+    // Solo administrador
+    if (adminToken) {
+        return true;
+    }
+
+    // Bloquear cliente e invitados si no hay token
+    router.navigate(['/']);
     return false;
 };

@@ -1,71 +1,99 @@
-import { Component, inject, Input } from '@angular/core';
 import {
-    CartItem,
-    CartRedisService,
-} from '../../../../core/services/cart-redis.service';
-import { Product } from '../../../../core/interfaces/product.interface';
-import { map } from 'rxjs';
+    Component,
+    Input,
+    Output,
+    EventEmitter,
+    SimpleChanges,
+    OnChanges,
+} from '@angular/core';
+import { CommonModule, DecimalPipe } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { MatIcon } from '@angular/material/icon';
+import { Product } from '../../../../core/interfaces/product.interface';
 
 @Component({
     selector: 'app-admin-product-card',
-    imports: [MatIcon],
+    standalone: true,
+    imports: [MatIcon, FormsModule, CommonModule, DecimalPipe],
     templateUrl: './admin-product-card.html',
     styleUrl: './admin-product-card.css',
 })
-export class AdminProductCard {
-    public cartRedisService = inject(CartRedisService);
-
+export class AdminProductCard implements OnChanges {
     @Input() product!: Product;
+    @Input() tipoCambio!: number;
+    @Input() categoriesList: any[] = [];
+    @Input() marcasList: any[] = [];
+    @Output() onSave = new EventEmitter<Product>();
 
-    toggleCart(event: Event) {
-        event.stopPropagation();
+    editMode = false;
+    editableProduct!: Product;
 
-        const isProductInCart = this.getCartSnapshot().some(
-            (i) => i.productId === String(this.product.id),
-        );
+    // Variables temporales para los inputs de texto en la edición
+    selectedCategoryName = '';
+    selectedMarcaName = '';
 
-        if (isProductInCart) {
-            // Si el método en tu servicio se llama removeItem o removeAnonymousCartItem, asegúrate de invocarlo correctamente:
-            this.cartRedisService.removeItem(String(this.product.id));
-            console.log('Producto removido:', this.product.id);
-        } else {
-            const item: CartItem = {
-                referencia_interna: this.product.referencia_interna,
-                productId: String(this.product.id),
-                name: this.product.nombre,
-                price_dolares: this.product.precio_venta_dolares,
-                price_soles: this.product.precio_venta_soles,
-                cantidad: 1,
-                imageUrl: this.product.imagen_url, // Mapeamos también la URL de la imagen de paso
-                marca: {
-                    nombre: this.product.marca?.nombre || 'Sin marca',
-                },
-                categoria: {
-                    nombre: this.product.categoria?.nombre || 'Sin categoría',
-                },
-            };
-            this.cartRedisService.addToCart(item);
-            console.log('Producto agregado:', item);
+    // Detecta cuando el padre modifica el producto (por ejemplo, al recalcular el Tipo de Cambio)
+    ngOnChanges(changes: SimpleChanges) {
+        if (changes['product']) {
+            this.editMode = false; // Cancela la edición activa para evitar inconsistencias
+            this.resetEditableProduct(); // Recarga los nuevos valores calculados
         }
     }
 
-    private getCartSnapshot(): CartItem[] {
-        let items: CartItem[] = [];
-        this.cartRedisService.cartItems$
-            .subscribe((i) => (items = i))
-            .unsubscribe();
-        return items;
+    private resetEditableProduct() {
+        if (this.product) {
+            this.editableProduct = {
+                ...this.product,
+                nombre: this.product.nombre || '',
+                costo_dolares: this.product.costo_dolares,
+                costo_soles: this.product.costo_soles,
+                precio_venta_dolares: this.product.precio_venta_dolares,
+                precio_venta_soles: this.product.precio_venta_soles,
+            };
+            // Cargamos los nombres actuales en los inputs del formulario de edición
+            this.selectedCategoryName = this.product.categoria?.nombre || '';
+            this.selectedMarcaName = this.product.marca?.nombre || '';
+        }
     }
 
-    isInCart() {
-        return this.cartRedisService.cartItems$.pipe(
-            map((items) =>
-                items.some(
-                    (item) => item.productId === String(this.product.id),
-                ),
-            ),
-        );
+    toggleEdit() {
+        if (this.editMode) {
+            // Al hacer click en "Actualizar", buscamos los objetos correspondientes en las listas
+            const foundCategory = this.categoriesList.find(
+                (c) =>
+                    c.nombre.toLowerCase() ===
+                    this.selectedCategoryName.trim().toLowerCase(),
+            );
+            const foundMarca = this.marcasList.find(
+                (m) =>
+                    m.nombre.toLowerCase() ===
+                    this.selectedMarcaName.trim().toLowerCase(),
+            );
+
+            if (!foundCategory || !foundMarca) {
+                alert(
+                    'Por favor selecciona una Categoría y Marca válidas de la lista de sugerencias.',
+                );
+                return;
+            }
+
+            // Asignamos las relaciones completas para actualizar la vista local de inmediato
+            this.product = {
+                ...this.editableProduct,
+                categoria: foundCategory,
+                marca: foundMarca,
+            };
+
+            this.onSave.emit(this.product);
+        } else {
+            this.resetEditableProduct();
+        }
+        this.editMode = !this.editMode;
+    }
+
+    cancelEdit() {
+        this.resetEditableProduct();
+        this.editMode = false;
     }
 
     onImageError(event: Event) {

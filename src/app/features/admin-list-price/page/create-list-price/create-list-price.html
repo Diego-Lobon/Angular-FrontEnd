@@ -1,0 +1,342 @@
+<div class="mt-20 px-4 py-6 bg-gray-50 min-h-screen">
+    <div class="max-w-5xl mx-auto flex flex-col gap-6">
+        <div
+            class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 w-full max-w-md mx-auto"
+        >
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-bold text-gray-800 text-center">
+                    Crear Lista de Precios
+                </h2>
+                <button
+                    [routerLink]="['/home-list-price']"
+                    class="bg-black text-white rounded-[0.4rem] py-2 px-4 font-bold hover:bg-gray-500 active:bg-gray-500"
+                >
+                    Regresar
+                </button>
+            </div>
+
+            <form class="flex flex-col gap-4">
+                
+                <div
+    class="flex flex-col gap-3 bg-gray-50 p-4 rounded-xl border border-gray-200/60"
+>
+    <label class="text-sm font-semibold text-gray-700">¿A qué productos se aplica?</label>
+
+    <div>
+        <input
+            class="w-full bg-white border border-gray-300 rounded-lg p-3 text-sm focus:outline-none focus:border-black"
+            type="text"
+            placeholder="Nombre de la lista"
+            [ngModel]="nombreLista()"
+            (ngModelChange)="nombreLista.set($event)"
+            name="nombreLista"
+        />
+    </div>
+
+    <div class="grid grid-cols-2 gap-4 bg-white p-2 rounded-xl border border-gray-200 text-sm mb-1">
+        <label class="flex items-center gap-2 justify-center py-2 px-3 rounded-lg cursor-pointer transition-colors"
+               [class.bg-black]="modoSeleccion() === 'FILTROS'"
+               [class.text-white]="modoSeleccion() === 'FILTROS'">
+            <input 
+                type="radio" 
+                name="modoSeleccion" 
+                value="FILTROS" 
+                class="hidden"
+                [ngModel]="modoSeleccion()" 
+                (ngModelChange)="cambiarModoSeleccion($event)" 
+            />
+            <mat-icon class="text-sm scale-90">filter_alt</mat-icon>
+            Por Filtros
+        </label>
+        
+        <label class="flex items-center gap-2 justify-center py-2 px-3 rounded-lg cursor-pointer transition-colors"
+               [class.bg-black]="modoSeleccion() === 'INDIVIDUAL'"
+               [class.text-white]="modoSeleccion() === 'INDIVIDUAL'">
+            <input 
+                type="radio" 
+                name="modoSeleccion" 
+                value="INDIVIDUAL" 
+                class="hidden"
+                [ngModel]="modoSeleccion()" 
+                (ngModelChange)="cambiarModoSeleccion($event)" 
+            />
+            <mat-icon class="text-sm scale-90">search</mat-icon>
+            Producto Específico
+        </label>
+    </div>
+
+    @if (modoSeleccion() === 'FILTROS') {
+        <div class="grid grid-cols-3 gap-2">
+            <select
+                class="col-span-2 bg-white border border-gray-300 rounded-lg p-3 text-sm focus:outline-none focus:border-black"
+                [ngModel]="selectedMarcaId()"
+                (ngModelChange)="selectedMarcaId.set($event)"
+                name="marca"
+            >
+                <option value="">-- Todas las Marcas --</option>
+                @for(marca of marcas(); track marca.id) {
+                    <option [value]="marca.id">{{ marca.nombre }}</option>
+                }
+            </select>
+
+            <select
+                class="bg-white border border-gray-300 rounded-lg p-3 text-sm focus:outline-none focus:border-black"
+                [ngModel]="selectedMoneda()"
+                (ngModelChange)="cambiarMonedaGlobal($event)"
+                name="moneda"
+            >
+                <option value="SOLES">SOLES</option>
+                <option value="DOLARES">DOLARES</option>
+            </select>
+        </div>
+
+        <div>
+            <select
+                class="w-full bg-white border border-gray-300 rounded-lg p-3 text-sm focus:outline-none focus:border-black"
+                [ngModel]="selectedCategoriaId()"
+                (ngModelChange)="selectedCategoriaId.set($event)"
+                name="categoria"
+            >
+                <option value="">-- Todas las Categorías --</option>
+                @for(category of categories(); track category.id) {
+                    <option [value]="category.id">{{ category.nombre }}</option>
+                }
+            </select>
+        </div>
+    }
+
+    @if (modoSeleccion() === 'INDIVIDUAL') {
+        <div class="grid grid-cols-3 gap-2">
+            <div class="col-span-2 relative">
+                <input
+                    type="text"
+                    class="w-full bg-white border border-gray-300 rounded-lg p-3 text-sm focus:outline-none focus:border-black"
+                    placeholder="Buscar producto..."
+                    [ngModel]="busquedaProducto()"
+                    (ngModelChange)="buscarProductosPredictivo($event)"
+                    name="busquedaProducto"
+                    autocomplete="off"
+                />
+                
+                @if (sugerenciasProductos().length > 0) {
+                    <ul class="absolute z-50 w-full bg-white border border-gray-200 mt-1 rounded-xl shadow-lg max-h-60 overflow-y-auto divide-y divide-gray-50">
+                        @for (prod of sugerenciasProductos(); track prod.id) {
+                            <li 
+                                (click)="seleccionarSugerencia(prod)"
+                                class="p-3 text-xs hover:bg-gray-50 cursor-pointer transition-colors flex flex-col gap-0.5"
+                            >
+                                <span class="font-semibold text-gray-800">{{ prod.nombre }}</span>
+                                <span class="font-mono text-[10px] text-gray-400">Ref: {{ prod.referencia_interna || 'SIN CODIGO' }}</span>
+                            </li>
+                        }
+                    </ul>
+                }
+            </div>
+
+            <select
+                class="bg-white border border-gray-300 rounded-lg p-3 text-sm focus:outline-none focus:border-black"
+                [ngModel]="selectedMoneda()"
+                (ngModelChange)="cambiarMonedaGlobal($event)"
+                name="moneda"
+            >
+                <option value="SOLES">SOLES</option>
+                <option value="DOLARES">DOLARES</option>
+            </select>
+        </div>
+    }
+
+    <div class="grid grid-cols-3 gap-2 items-center">
+        <select
+            class="col-span-2 bg-white border border-gray-300 rounded-lg p-3 text-sm focus:outline-none focus:border-black"
+            [ngModel]="tipoReglaMaestro()"
+            (ngModelChange)="tipoReglaMaestro.set($event)"
+            name="tipoReglaMaestro"
+        >
+            <option value="DESCUENTO">Aplicar Descuento Base</option>
+            <option value="PRECIO_FIJO">Aplicar Precio Fijo Manual</option>
+        </select>
+
+        <div class="relative flex items-center">
+            <input
+                type="number"
+                placeholder="0"
+                class="w-full border border-gray-300 rounded-lg p-3 text-sm pr-6 text-center focus:outline-none focus:border-black disabled:bg-gray-100 disabled:text-gray-400"
+                [ngModel]="descuentoBase()"
+                (ngModelChange)="descuentoBase.set($event)"
+                name="descuento"
+                [disabled]="tipoReglaMaestro() === 'PRECIO_FIJO'"
+            />
+            <span class="absolute right-2 text-gray-400 text-sm">%</span>
+        </div>
+    </div>
+
+    <button
+        type="button"
+        (click)="agregarProductosFiltrados()"
+        class="w-full bg-black text-white font-semibold text-base p-4 rounded-xl shadow-md hover:bg-gray-900 active:scale-[0.98] transition-all mt-2 text-center"
+    >
+        Añadir Productos
+    </button>
+</div>
+
+                <button
+    type="button"
+    (click)="aplicarConfiguracion()"
+    [disabled]="isSubmitting()"
+    class="w-full bg-black text-white font-semibold text-base p-4 rounded-xl shadow-md hover:bg-gray-900 active:scale-[0.98] transition-all text-center flex items-center justify-center gap-2 disabled:bg-gray-400 disabled:scale-100 disabled:cursor-not-allowed"
+>
+    @if (isSubmitting()) {
+        <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        <span>Procesando...</span>
+    } @else {
+        <span>Crear Lista</span>
+    }
+</button>
+            </form>
+        </div>
+
+        @if (selectedProductsList().length > 0) {
+        <div
+            class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 w-full transition-all duration-300"
+        >
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-bold text-gray-800">
+                    Productos en la Lista
+                </h3>
+                <span
+                    class="bg-gray-100 text-gray-700 text-xs font-semibold px-3 py-1 rounded-full"
+                >
+                    {{ selectedProductsList().length }} items
+                </span>
+            </div>
+
+            <div
+                class="w-full overflow-x-auto pb-2 scrollbar-thin select-text touch-pan-x"
+            >
+                <table
+                    class="w-full min-w-[700px] text-left border-collapse table-fixed"
+                >
+                    <thead>
+                        <tr
+                            class="border-b border-gray-200 text-gray-500 text-xs font-semibold uppercase bg-gray-50/70"
+                        >
+                            <th class="py-3 px-4 w-[12%]">Código</th>
+                            <th class="py-3 px-4 w-[33%]">Producto</th>
+                            <th class="py-3 px-4 w-[20%] text-center">
+                                Modo Regla
+                            </th>
+                            <th
+                                class="py-3 px-4 w-[17%] text-center font-bold text-black bg-gray-50/90"
+                            >
+                                Precio ({{ selectedMoneda() }})
+                            </th>
+                            <th class="py-3 px-4 w-[13%] text-center">
+                                Descuento %
+                            </th>
+                            <th class="py-3 px-4 w-[5%] text-center">Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody
+                        class="divide-y divide-gray-100 text-sm text-gray-700"
+                    >
+                        @for (item of selectedProductsList(); track item.id) {
+                        <tr class="hover:bg-gray-50/50 transition-colors">
+                            <td
+                                class="py-3 px-4 font-mono text-xs text-gray-500 truncate"
+                            >
+                                {{ item.codigo }}
+                            </td>
+                            <td
+                                class="py-3 px-4 font-medium text-gray-800 break-words"
+                            >
+                                {{ item.nombre }}
+                            </td>
+
+                            <td class="py-3 px-4 text-center">
+                                <div
+                                    class="inline-flex bg-gray-100 p-1 rounded-lg border border-gray-200"
+                                >
+                                    <button
+                                        type="button"
+                                        (click)="cambiarReglaFila(item, 'DESCUENTO')"
+                                        [class]="item.tipoRegla === 'DESCUENTO' 
+                                            ? 'bg-white text-black font-bold shadow-sm rounded-md px-2 py-1 text-xs transition-all' 
+                                            : 'text-gray-400 px-2 py-1 text-xs hover:text-gray-600 transition-all'"
+                                    >
+                                        % Desc
+                                    </button>
+                                    <button
+                                        type="button"
+                                        (click)="cambiarReglaFila(item, 'PRECIO_FIJO')"
+                                        [class]="item.tipoRegla === 'PRECIO_FIJO' 
+                                            ? 'bg-black text-white font-bold shadow-sm rounded-md px-2 py-1 text-xs transition-all' 
+                                            : 'text-gray-400 px-2 py-1 text-xs hover:text-gray-600 transition-all'"
+                                    >
+                                        $ Fijo
+                                    </button>
+                                </div>
+                            </td>
+
+                            <td class="py-3 px-4">
+                                <div
+                                    [class]="item.tipoRegla === 'DESCUENTO'
+                                        ? 'flex items-center justify-center bg-gray-100/80 border border-gray-200 rounded-lg px-2 py-1 max-w-[110px] mx-auto text-gray-400 cursor-not-allowed'
+                                        : 'flex items-center justify-center bg-white border border-gray-300 rounded-lg px-2 py-1 max-w-[110px] mx-auto focus-within:border-black'"
+                                >
+                                    <span class="text-xs mr-1"
+                                        >{{ selectedMoneda() === 'SOLES' ? 'S/'
+                                        : '$' }}</span
+                                    >
+                                    <input
+                                        type="number"
+                                        class="w-full bg-transparent text-sm text-center font-semibold focus:outline-none disabled:cursor-not-allowed"
+                                        [(ngModel)]="item.precioEditable"
+                                        [name]="'precio-' + item.id"
+                                        [disabled]="item.tipoRegla === 'DESCUENTO'"
+                                    />
+                                </div>
+                            </td>
+
+                            <td class="py-3 px-4">
+                                <div
+                                    [class]="item.tipoRegla === 'PRECIO_FIJO'
+                                        ? 'flex items-center justify-center bg-gray-100/80 border border-gray-200 rounded-lg px-2 py-1 max-w-[80px] mx-auto text-gray-400 cursor-not-allowed'
+                                        : 'flex items-center justify-center bg-white border border-gray-300 rounded-lg px-2 py-1 max-w-[80px] mx-auto focus-within:border-black'"
+                                >
+                                    <input
+                                        type="number"
+                                        class="w-full bg-transparent text-sm text-center focus:outline-none disabled:cursor-not-allowed"
+                                        [(ngModel)]="item.descuentoEditable"
+                                        [name]="'desc-' + item.id"
+                                        min="0"
+                                        max="100"
+                                        [disabled]="item.tipoRegla === 'PRECIO_FIJO'"
+                                    />
+                                    <span class="text-xs ml-0.5">%</span>
+                                </div>
+                            </td>
+
+                            <td class="py-3 px-4 text-center">
+                                <button
+                                    type="button"
+                                    (click)="eliminarProductoDeLista(item.id)"
+                                    class="text-gray-400 hover:text-red-500 p-1 rounded-lg hover:bg-red-50 transition-colors flex items-center justify-center mx-auto"
+                                >
+                                    <mat-icon
+                                        class="text-xl flex items-center justify-center"
+                                        >delete</mat-icon
+                                    >
+                                </button>
+                            </td>
+                        </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        }
+    </div>
+</div>

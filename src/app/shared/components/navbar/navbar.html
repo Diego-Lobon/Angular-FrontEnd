@@ -3,7 +3,7 @@
 >
     <img
         routerLink="/"
-        class="h-16"
+        class="h-16 cursor-pointer"
         src="assets/logos/logo-isur.png"
         alt="Logo-ISUR"
     />
@@ -61,10 +61,8 @@
 
         <a routerLink="/cotizar" (click)="closeMenu()"> Cotización </a>
 
-        @if(authService.isLoggedIn()){
-        <a routerLink="/valid-cotizacion" (click)="closeMenu()">
-            Validar Cotización
-        </a>
+        @if(authClienteService.isLoggedIn()){
+
         <button
             (click)="closeMenu(); logout()"
             class="bg-black text-white rounded-[0.4rem] p-1 text-center hover:bg-gray-500 active:bg-gray-500"

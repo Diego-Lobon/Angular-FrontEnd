@@ -1,0 +1,87 @@
+<div class="mt-16 px-4 py-8">
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-2xl font-semibold text-gray-800">Listas de precios</h1>
+        <button
+            routerLink="create"
+            class="bg-black text-white rounded-[0.4rem] py-2 px-4 font-bold hover:bg-gray-500 active:bg-gray-500"
+        >
+            Crear
+        </button>
+    </div>
+
+    <div class="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+        <table class="w-full text-left border-collapse table-fixed">
+            <thead>
+                <tr
+                    class="border-b border-gray-200 text-gray-500 text-xs font-semibold uppercase bg-gray-50/70"
+                >
+                    <th class="py-3 px-4 w-[20%]">ID</th>
+                    <th class="py-3 px-4 w-[50%]">Nombre</th>
+                    <th class="py-3 px-4 w-[30%] text-center">Opciones</th>
+                </tr>
+            </thead>
+
+            <tbody class="divide-y divide-gray-100 text-sm text-gray-700">
+                <!-- LOADING -->
+                @if(loading()) {
+                <tr>
+                    <td colspan="3" class="py-16">
+                        <div class="flex flex-col items-center gap-4">
+                            <!-- Spinner -->
+                            <div
+                                class="w-12 h-12 rounded-full border-4 border-gray-200 border-t-black animate-spin"
+                            ></div>
+
+                            <span class="text-gray-500 font-medium">
+                                Loading...
+                            </span>
+                        </div>
+                    </td>
+                </tr>
+
+                } @else { @for (item of listas(); track item.id) {
+
+                <tr class="hover:bg-gray-50 transition-colors">
+                    <td class="py-4 px-4 font-mono text-xs text-gray-500">
+                        {{ item.id }}
+                    </td>
+
+                    <td class="py-4 px-4 font-medium text-gray-800">
+                        {{ item.name }}
+                    </td>
+
+                    <td class="py-4 px-4">
+                        <div class="flex justify-center gap-2">
+                            <button
+                                [routerLink]="['edit', item.id]"
+                                class="text-gray-400 hover:text-blue-600 p-2 rounded-lg hover:bg-blue-50"
+                            >
+                                <mat-icon>edit</mat-icon>
+                            </button>
+
+                            <button
+                                (click)="eliminar(item.id)"
+                                class="text-gray-400 hover:text-red-500 p-2 rounded-lg hover:bg-red-50"
+                            >
+                                <mat-icon>delete</mat-icon>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+
+                } @empty {
+
+                <tr>
+                    <td
+                        colspan="3"
+                        class="py-12 text-center text-gray-400 italic"
+                    >
+                        No hay listas de precios registradas
+                    </td>
+                </tr>
+
+                } }
+            </tbody>
+        </table>
+    </div>
+</div>

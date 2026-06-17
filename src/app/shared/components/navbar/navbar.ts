@@ -1,7 +1,7 @@
-import { Component } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Component, inject } from '@angular/core'; // 💡 Cambiamos por inject
+import { RouterLink, Router } from '@angular/router'; // 💡 Simplificamos imports
 import { MatIconModule } from '@angular/material/icon';
-import { AuthService } from '../../../core/services/auth';
+import { AuthClienteService } from '../../../core/services/auth-cliente.service';
 
 @Component({
     selector: 'app-navbar',
@@ -11,7 +11,9 @@ import { AuthService } from '../../../core/services/auth';
     styleUrl: './navbar.css',
 })
 export class Navbar {
-    constructor(public authService: AuthService) {}
+    // 💡 Inyección moderna por propiedades (Evita el error NG0203 y errores de Scope de JS)
+    public authClienteService = inject(AuthClienteService);
+    private router = inject(Router);
 
     isMenuOpen = false;
 
@@ -28,6 +30,9 @@ export class Navbar {
     }
 
     logout() {
-        this.authService.logout();
+        this.authClienteService.logout();
+
+        // 💡 Ahora 'this.router' está perfectamente definido y disponible en cualquier contexto
+        this.router.navigate(['/']);
     }
 }

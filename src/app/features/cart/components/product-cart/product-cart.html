@@ -3,32 +3,41 @@
 >
     <img
         class="w-min m-auto"
-        [src]="product?.imagen_url || 'assets/products/product-void.jpeg'"
+        [src]="product?.imageUrl || 'assets/products/product-void.jpeg'"
         (error)="onImageError($event)"
     />
     <div class="flex flex-col gap-1.5">
-        <span class="text-2xl text-gray-600">{{ product.nombre }}</span>
+        <span class="text-2xl text-gray-600">{{ product.name }}</span>
 
         <div class="flex gap-1 text-[1rem]">
-            <span>{{ product.marca.nombre || 'Genérico' }}</span>
+            <span>{{ product.marca?.nombre || 'Genérico' }}</span>
             <span>-</span>
-            <span>{{ product?.categoria.nombre || 'Sin categoría' }}</span>
+            <span>{{ product?.categoria?.nombre || 'Sin categoría' }}</span>
         </div>
-
+        @if(authClienteService.isLoggedIn()){
+        <div
+            class="flex justify-between items-center my-2 text-xl border-b pb-2 border-gray-100"
+        >
+            <span class="font-bold text-gray-500">Precio:</span>
+            <span class="font-bold text-gray-800">
+                {{ displaySymbol() }} {{ displayPrice() | number:'1.2-2' }}
+            </span>
+        </div>
+        }
         <div class="flex justify-between mt-2">
             <div class="flex gap-1 items-center">
                 <span class="text-[1rem]">Cantidad: </span>
                 <div class="flex gap-2 h-12">
                     <button
                         (click)="decreaseCant()"
-                        class="bg-black hover:bg-gray-500 active:bg-gray-500 text-white text-3xl rounded-[0.4rem] w-10"
+                        class="bg-black cursor-pointer hover:bg-gray-500 active:bg-gray-500 text-white text-3xl rounded-[0.4rem] w-10"
                     >
                         -
                     </button>
                     <span class="m-auto text-[1.2rem]">{{ cant() }}</span>
                     <button
                         (click)="increaseCant()"
-                        class="bg-black hover:bg-gray-500 active:bg-gray-500 text-white text-3xl rounded-[0.4rem] w-10"
+                        class="bg-black cursor-pointer hover:bg-gray-500 active:bg-gray-500 text-white text-3xl rounded-[0.4rem] w-10"
                     >
                         +
                     </button>
@@ -36,7 +45,7 @@
             </div>
             <button
                 (click)="removeProduct()"
-                class="flex justify-center items-center bg-red-500 hover:bg-red-300 active:bg-red-300 rounded-[0.4rem] px-1.5"
+                class="flex cursor-pointer justify-center items-center bg-red-500 hover:bg-red-300 active:bg-red-300 rounded-[0.4rem] px-1.5"
             >
                 <mat-icon class="text-white! text-3xl! w-auto! h-auto!"
                     >restore_from_trash</mat-icon

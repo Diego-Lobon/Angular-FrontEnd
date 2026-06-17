@@ -11,17 +11,26 @@
             <span>-</span>
             <span>{{ product.categoria.nombre }}</span>
         </div>
-        <div class="flex justify-between mt-2">
-            <p>
+        <div class="flex mt-2">
+            <p class="text-sm text-gray-400">
                 Lorem ipsum dolor sit amet consectetur adipisicing elit. Labore,
-                dolore velit hic laudantium asperiores nemo nesciunt nihil
-                saepe.
+                dolore velit hic laudantium asperiores nemo nesciunt.
             </p>
         </div>
 
+        @if(authClienteService.isLoggedIn()){
+        <div class="flex justify-between mt-2 text-xl">
+            <span class="font-bold text-gray-500">Precio:</span>
+            <span class="font-semibold text-gray-800">
+                {{ product.custom_symbol }} {{ product.custom_price |
+                number:'1.2-2' }}
+            </span>
+        </div>
+        }
+
         <button
             (click)="toggleCart($event)"
-            class="flex justify-center items-center gap-1 text-lg mt-3 text-white py-2 rounded-[0.4rem] transition-colors"
+            class="flex justify-center cursor-pointer items-center gap-1 text-lg mt-3 text-white py-2 rounded-[0.4rem] transition-colors"
             [ngClass]="(isInCart() | async)
                 ? 'bg-red-500 hover:bg-red-600 active:bg-red-700'
                 : 'bg-black hover:bg-gray-800 active:bg-black'"
@@ -30,9 +39,9 @@
                 {{ (isInCart() | async) ? 'remove_shopping_cart' :
                 'add_shopping_cart' }}
             </mat-icon>
-
             <span>
-                {{ (isInCart() | async) ? 'Quitar del carrito' : 'Agregar al carrito' }}
+                {{ (isInCart() | async) ? 'Quitar del carrito' : 'Agregar al
+                carrito' }}
             </span>
         </button>
     </div>

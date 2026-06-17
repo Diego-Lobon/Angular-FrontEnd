@@ -3,7 +3,8 @@ export interface Product {
     id_migracion: string;
     referencia_interna: string;
     nombre: string;
-    costo: number;
+    costo_dolares: number;
+    costo_soles: number;
     precio_venta_dolares: number;
     precio_venta_soles: number;
     unidad_medida: string;

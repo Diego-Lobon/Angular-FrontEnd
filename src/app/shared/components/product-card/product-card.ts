@@ -1,6 +1,5 @@
 import { Component, Input, inject } from '@angular/core';
 import { MatIcon } from '@angular/material/icon';
-// 💡 IMPORTANTE: Asegúrate de importar AsyncPipe además de CommonModule
 import { CommonModule, AsyncPipe } from '@angular/common';
 import {
     CartRedisService,
@@ -8,19 +7,27 @@ import {
 } from '../../../core/services/cart-redis.service';
 import { Product } from '../../../core/interfaces/product.interface';
 import { map } from 'rxjs';
+import { AuthClienteService } from '../../../core/services/auth-cliente.service';
+
+// Creamos un tipo extendido para soportar las propiedades dinámicas de Odoo
+type OdooProduct = Product & {
+    custom_price?: number;
+    custom_symbol?: string;
+};
 
 @Component({
     selector: 'app-product-card',
     standalone: true,
-    // 💡 AGREGAMOS AsyncPipe AQUÍ
     imports: [CommonModule, AsyncPipe, MatIcon],
     templateUrl: './product-card.html',
     styleUrl: './product-card.css',
 })
 export class ProductCard {
+    public authClienteService = inject(AuthClienteService);
     public cartRedisService = inject(CartRedisService);
 
-    @Input() product!: Product;
+    // Cambiamos el tipo de la propiedad Input
+    @Input() product!: OdooProduct;
 
     toggleCart(event: Event) {
         event.stopPropagation();
@@ -30,18 +37,36 @@ export class ProductCard {
         );
 
         if (isProductInCart) {
-            // Si el método en tu servicio se llama removeItem o removeAnonymousCartItem, asegúrate de invocarlo correctamente:
             this.cartRedisService.removeItem(String(this.product.id));
-            console.log('Producto removido:', this.product.id);
+            console.log('Producto removido del carrito:', this.product.id);
         } else {
+            const currentSymbol = this.product.custom_symbol;
+
+            // 💡 Determinamos el String exacto de la moneda según el símbolo actual
+            const monedaSeleccionada: 'USD' | 'PEN' =
+                currentSymbol === '$' ? 'USD' : 'PEN';
+
+            const finalPriceSoles =
+                currentSymbol === 'S/.' || currentSymbol === 'S/.'
+                    ? (this.product.custom_price ??
+                      Number(this.product.precio_venta_soles))
+                    : Number(this.product.precio_venta_soles);
+
+            const finalPriceDolares =
+                currentSymbol === '$'
+                    ? (this.product.custom_price ??
+                      Number(this.product.precio_venta_dolares))
+                    : Number(this.product.precio_venta_dolares);
+
             const item: CartItem = {
                 referencia_interna: this.product.referencia_interna,
                 productId: String(this.product.id),
                 name: this.product.nombre,
-                price_dolares: this.product.precio_venta_dolares,
-                price_soles: this.product.precio_venta_soles,
+                price_dolares: finalPriceDolares,
+                price_soles: finalPriceSoles,
+                moneda: monedaSeleccionada, // 💡 Guardado explícitamente en el registro de Redis
                 cantidad: 1,
-                imageUrl: this.product.imagen_url, // Mapeamos también la URL de la imagen de paso
+                imageUrl: this.product.imagen_url,
                 marca: {
                     nombre: this.product.marca?.nombre || 'Sin marca',
                 },
@@ -49,8 +74,9 @@ export class ProductCard {
                     nombre: this.product.categoria?.nombre || 'Sin categoría',
                 },
             };
+
             this.cartRedisService.addToCart(item);
-            console.log('Producto agregado:', item);
+            console.log('Producto indexado a Redis con su moneda:', item);
         }
     }
 

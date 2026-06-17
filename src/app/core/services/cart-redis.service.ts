@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { BehaviorSubject, Observable, map } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../environments/environment';
 
 export interface CartItem {
     referencia_interna: string;
@@ -8,6 +9,7 @@ export interface CartItem {
     name: string;
     price_dolares: number;
     price_soles: number;
+    moneda: 'USD' | 'PEN';
     cantidad: number;
     imageUrl?: string;
     marca?: {
@@ -23,46 +25,86 @@ export interface CartItem {
 })
 export class CartRedisService {
     private http = inject(HttpClient);
-    private readonly API_URL = 'http://192.168.18.38:3000/cart'; // Cambia al puerto de tu NestJS
+    private readonly API_URL = `${environment.api_nest}/cart`;
 
     private CART_STORAGE_KEY = 'anonymous_cart';
     private CART_ID_KEY = 'anonymous_cart_id';
 
-    private cartItemsSubject = new BehaviorSubject<CartItem[]>(
-        this.getCartFromLocalStorage(),
-    );
+    private cartItemsSubject = new BehaviorSubject<CartItem[]>([]);
     public cartItems$ = this.cartItemsSubject.asObservable();
 
     constructor() {
+        if (typeof window !== 'undefined') {
+            queueMicrotask(() => {
+                this.syncWithRedisOnLoad();
+            });
+        }
+    }
+
+    // 💡 NUEVO: Fuerza el cambio de contexto y recarga los datos correctos de Redis
+    public switchCartContext(): void {
+        console.log('[CartRedisService] Cambiando contexto de carrito...');
         this.syncWithRedisOnLoad();
     }
 
-    // Obtiene o genera un ID único para la máquina del usuario anónimo
+    private isLogged(): boolean {
+        if (typeof window === 'undefined') {
+            return false;
+        }
+
+        return !!localStorage.getItem('token_cliente');
+    }
+
+    // 💡 MODIFICADO: Retorna un ID dinámico dependiendo de si el usuario está logueado o no
     private getOrCreateCartId(): string {
-        // 1. Validamos que estemos del lado del cliente (navegador) para no romper el SSR
         if (typeof window === 'undefined') {
             return '';
         }
 
+        const token = localStorage.getItem('token_cliente');
+
+        if (token) {
+            const idCliente = this.obtenerIdClienteDesdeJwt(token);
+
+            if (idCliente) {
+                this.CART_STORAGE_KEY = `client_cart_storage_${idCliente}`;
+
+                return `client_cart_${idCliente}`;
+            }
+        }
+
+        this.CART_STORAGE_KEY = 'anonymous_cart';
+
         let id = localStorage.getItem(this.CART_ID_KEY);
 
         if (!id) {
-            // 2. Intentamos usar el método nativo si está disponible
             if (
                 typeof crypto !== 'undefined' &&
                 typeof crypto.randomUUID === 'function'
             ) {
                 id = crypto.randomUUID();
             } else {
-                // 3. Solución alternativa (Fallback) si el navegador bloquea la API por HTTP
                 id = this.generateFallbackUUID();
             }
+
             localStorage.setItem(this.CART_ID_KEY, id);
         }
+
         return id;
     }
 
-    // Método auxiliar matemático para construir un UUID v4 estándar
+    // 💡 NUEVO: Extrae de forma segura el identificador único del JWT (sub o id)
+    private obtenerIdClienteDesdeJwt(token: string): string | null {
+        try {
+            const base64Url = token.split('.')[1];
+            const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+            const payload = JSON.parse(window.atob(base64));
+            return payload.sub || payload.id || null;
+        } catch (e) {
+            return null;
+        }
+    }
+
     private generateFallbackUUID(): string {
         return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
             const r = (Math.random() * 16) | 0;
@@ -79,59 +121,38 @@ export class CartRedisService {
         return [];
     }
 
-    // Guarda localmente y dispara la sincronización hacia NestJS + Redis
     private saveAndSyncCart(cart: CartItem[]): void {
         localStorage.setItem(this.CART_STORAGE_KEY, JSON.stringify(cart));
+
         this.cartItemsSubject.next(cart);
 
-        // Envía el carrito a NestJS para guardarlo en Redis
         const cartId = this.getOrCreateCartId();
-        this.http.post(`${this.API_URL}/${cartId}`, cart).subscribe({
-            error: (err) =>
-                console.error('Error sincronizando con Redis:', err),
-        });
+
+        const endpoint = this.isLogged()
+            ? `${this.API_URL}/user/${cartId.replace('client_cart_', '')}`
+            : `${this.API_URL}/anonymous/${cartId}`;
+
+        this.http.post(endpoint, cart).subscribe();
     }
 
-    // Al cargar la app, intenta recuperar el carrito que estaba en Redis
-    // Al cargar la app, intenta recuperar el carrito que estaba en Redis
     private syncWithRedisOnLoad(): void {
         const cartId = this.getOrCreateCartId();
 
-        if (!cartId) {
-            // Fallback inmediato si no hay entorno de navegador listo
-            this.cartItemsSubject.next(this.getCartFromLocalStorage());
-            return;
-        }
+        const endpoint = this.isLogged()
+            ? `${this.API_URL}/user/${cartId.replace('client_cart_', '')}`
+            : `${this.API_URL}/anonymous/${cartId}`;
 
-        this.http.get<CartItem[]>(`${this.API_URL}/${cartId}`).subscribe({
-            next: (redisCart) => {
-                // Si Redis tiene productos guardados de una sesión previa, los usamos
-                if (redisCart && redisCart.length > 0) {
-                    localStorage.setItem(
-                        this.CART_STORAGE_KEY,
-                        JSON.stringify(redisCart),
-                    );
-                    this.cartItemsSubject.next(redisCart);
-                } else {
-                    // 💡 SOLUCIÓN: Si Redis regresó vacío pero el usuario SÍ tenía productos agregados
-                    // localmente en esta sesión actual, forzamos la emisión de los datos locales.
-                    const localCart = this.getCartFromLocalStorage();
-                    this.cartItemsSubject.next(localCart);
-
-                    // Opcional: Si el local tiene cosas, lo subimos a Redis de una vez para sincronizar
-                    if (localCart.length > 0) {
-                        this.http
-                            .post(`${this.API_URL}/${cartId}`, localCart)
-                            .subscribe();
-                    }
-                }
-            },
-            error: (err) => {
-                console.warn(
-                    'No se pudo conectar a Redis, usando LocalStorage local.',
-                    err,
+        this.http.get<CartItem[]>(endpoint).subscribe({
+            next: (cart) => {
+                localStorage.setItem(
+                    this.CART_STORAGE_KEY,
+                    JSON.stringify(cart),
                 );
-                // Si el backend da error (ej. NestJS apagado), mantenemos vivos los datos de LocalStorage
+
+                this.cartItemsSubject.next(cart);
+            },
+
+            error: () => {
                 this.cartItemsSubject.next(this.getCartFromLocalStorage());
             },
         });
@@ -145,6 +166,7 @@ export class CartRedisService {
 
         if (existingItem) {
             existingItem.cantidad += item.cantidad;
+            existingItem.moneda = item.moneda;
         } else {
             currentCart.push(item);
         }
@@ -176,10 +198,13 @@ export class CartRedisService {
     getCartTotal(): Observable<number> {
         return this.cartItems$.pipe(
             map((items) =>
-                items.reduce(
-                    (acc, item) => acc + item.price_soles * item.cantidad,
-                    0,
-                ),
+                items.reduce((acc, item) => {
+                    const precio =
+                        item.moneda === 'USD'
+                            ? item.price_dolares
+                            : item.price_soles;
+                    return acc + precio * item.cantidad;
+                }, 0),
             ),
         );
     }

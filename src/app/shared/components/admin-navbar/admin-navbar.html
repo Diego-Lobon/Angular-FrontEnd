@@ -82,11 +82,18 @@
             <mat-icon class="text-lg!">request_quote</mat-icon> Productos
         </a>
         <a
-            routerLink="/admin-list-price"
+            routerLink="/home-list-price"
             (click)="closeMenu()"
             class="hover:text-white flex items-center gap-2 py-2 transition-colors"
         >
             <mat-icon class="text-lg!">monetization_on</mat-icon> Listas de precios
+        </a>
+        <a
+            routerLink="/valid-cotizacion"
+            (click)="closeMenu()"
+            class="hover:text-white flex items-center gap-2 py-2 transition-colors"
+        >
+            <mat-icon class="text-lg!">playlist_add_check</mat-icon> Validar Cotización
         </a>
         <button
             (click)="closeMenu(); logout()"

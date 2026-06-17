@@ -1,9 +1,12 @@
-import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { Component, inject } from '@angular/core';
+import { Router, RouterOutlet } from '@angular/router';
+
 import { Navbar } from './shared/components/navbar/navbar';
 import { Footer } from './shared/components/footer/footer';
-import { AuthService } from './core/services/auth';
 import { AdminNavbar } from './shared/components/admin-navbar/admin-navbar';
+
+import { AuthService } from './core/services/auth';
+import { AuthClienteService } from './core/services/auth-cliente.service';
 
 @Component({
     selector: 'app-root',
@@ -12,8 +15,39 @@ import { AdminNavbar } from './shared/components/admin-navbar/admin-navbar';
     styleUrl: './app.css',
 })
 export class App {
-    constructor(public authService: AuthService) {}
-    isLoggedIn() {
-        return !!localStorage.getItem('token');
+    router = inject(Router);
+
+    authService = inject(AuthService);
+    authClienteService = inject(AuthClienteService);
+
+    private adminRoutes = [
+        '/admin-dashboard',
+        '/admin-users',
+        '/admin-customers',
+        '/admin-products',
+        '/home-list-price',
+        '/valid-cotizacion',
+    ];
+
+    isAdminLoginPage(): boolean {
+        return this.router.url === '/login-admin';
+    }
+
+    isAdminRoute(): boolean {
+        return this.adminRoutes.some((route) =>
+            this.router.url.startsWith(route),
+        );
+    }
+
+    showAdminNavbar(): boolean {
+        return this.isAdminRoute() && this.authService.isLoggedIn();
+    }
+
+    showClientNavbar(): boolean {
+        return !this.isAdminRoute() && !this.isAdminLoginPage();
+    }
+
+    showFooter(): boolean {
+        return !this.isAdminRoute() && !this.isAdminLoginPage();
     }
 }

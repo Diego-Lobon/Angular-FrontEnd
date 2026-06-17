@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 
 import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
     providedIn: 'root',
@@ -8,16 +9,13 @@ import { HttpClient } from '@angular/common/http';
 export class PdfValidationService {
     constructor(private http: HttpClient) {}
 
-    private apiUrl = 'http://192.168.18.38:8000';
+    private apiUrl = environment.api_fastapi;
 
     validatePdf(file: File) {
         const formData = new FormData();
 
         formData.append('pdf', file);
-
-        return this.http.post(
-            `${this.apiUrl}/validate-pdf`,
-            formData
-        );
+        
+        return this.http.post(`${this.apiUrl}/validate-pdf`, formData);
     }
 }

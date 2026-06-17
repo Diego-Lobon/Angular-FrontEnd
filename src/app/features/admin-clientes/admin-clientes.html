@@ -1,0 +1,70 @@
+<div class="mt-16 px-4 py-6 bg-gray-50 min-h-screen">
+    <div class="max-w-xl mx-auto">
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-xl font-bold text-gray-800">Clientes</h2>
+            <span class="bg-black text-white px-2 py-1 rounded-full">
+                {{ clientes().length }} Total
+            </span>
+        </div>
+
+        <div class="flex flex-col gap-4">
+            @for ( cliente of clientes(); track cliente.id ) {
+
+            <div
+                class="flex justify-between bg-white p-4 rounded-xl border border-gray-300 shadow-sm items-center gap-4"
+            >
+                <div class="flex items-center gap-3 flex-1">
+                    <mat-icon class="h-auto! w-auto! text-3xl! text-gray-600">
+                        business
+                    </mat-icon>
+                    <div>
+                        <h3 class="font-bold text-gray-800">
+                            {{ cliente.nombre }}
+                        </h3>
+                        <p class="text-gray-500 text-sm">
+                            {{ cliente.correo || 'Sin correo' }}
+                        </p>
+                    </div>
+                </div>
+
+                <div class="relative w-44">
+                    <label class="block mb-1 text-xs font-medium text-gray-600">
+                        Lista de precios
+                    </label>
+
+                    <input
+                        type="text"
+                        placeholder="Buscar lista..."
+                        [value]="busquedas[cliente.id] || ''"
+                        (input)="onEscribiendo(cliente.id, $event)"
+                        [matAutocomplete]="auto"
+                        class="border border-gray-300 rounded p-2 w-full text-sm focus:outline-none focus:border-black"
+                    />
+
+                    <mat-autocomplete
+                        #auto="matAutocomplete"
+                        [displayWith]="mostrarNombreLista"
+                        (optionSelected)="onListaSeleccionada(cliente.id, $event.option.value)"
+                    >
+                        @for (lista of listasFiltradas(); track lista.id) {
+                        <mat-option [value]="lista">
+                            {{ lista.name }}
+                        </mat-option>
+                        }
+                    </mat-autocomplete>
+                </div>
+
+                <div class="self-end mb-0.5">
+                    <button
+                        (click)="guardarListaCliente(cliente.id)"
+                        class="bg-blue-600 hover:bg-blue-700 text-white font-medium text-sm px-4 py-2 rounded transition-colors shadow-sm"
+                    >
+                        Guardar
+                    </button>
+                </div>
+            </div>
+
+            }
+        </div>
+    </div>
+</div>

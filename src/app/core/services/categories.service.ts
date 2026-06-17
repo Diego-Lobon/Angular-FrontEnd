@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 
 import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
     providedIn: 'root',
@@ -8,7 +9,7 @@ import { HttpClient } from '@angular/common/http';
 export class CategoriesService {
     private http = inject(HttpClient);
 
-    private apiUrl = 'http://192.168.18.38:3000/categories';
+    private apiUrl = `${environment.api_nest}/categories`;
 
     getCategories() {
         return this.http.get<any[]>(this.apiUrl);

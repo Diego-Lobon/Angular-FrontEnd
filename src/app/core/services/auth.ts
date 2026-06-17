@@ -9,6 +9,8 @@ import { HttpClient } from '@angular/common/http';
 // * Verifica si estamos en un navegador
 import { isPlatformBrowser } from '@angular/common';
 
+import { environment } from '../../../environments/environment';
+
 // * Crea una única instancia de AuthService para toda la aplicación
 @Injectable({
     providedIn: 'root',
@@ -17,7 +19,8 @@ export class AuthService {
     // * Obtiene información del entorno actual
     private platformId = inject(PLATFORM_ID);
     // * URL del backend
-    private apiUrl = 'http://192.168.18.38:3000';
+    private apiUrl = environment.api_nest;
+    private readonly TOKEN_KEY = 'admin_token';
 
     // * Angular inyecta automáticamente HttpClient
     constructor(private http: HttpClient) {}
@@ -37,16 +40,17 @@ export class AuthService {
     // * Este método guarda el token
     saveToken(token: string) {
         if (isPlatformBrowser(this.platformId)) {
-            localStorage.setItem('token', token);
+            localStorage.setItem(this.TOKEN_KEY, token);
         }
     }
 
     // * Obtiene el token guardado
     getToken(): string | null {
-        if (isPlatformBrowser(this.platformId)) {
-            return localStorage.getItem('token');
+        if (!isPlatformBrowser(this.platformId)) {
+            return null;
         }
-        return null;
+
+        return localStorage.getItem(this.TOKEN_KEY);
     }
 
     // * Verifica si el token existe
@@ -57,7 +61,7 @@ export class AuthService {
     // * Cerrar sesion y elimina el token
     logout() {
         if (isPlatformBrowser(this.platformId)) {
-            localStorage.removeItem('token');
+            localStorage.removeItem(this.TOKEN_KEY);
         }
     }
 }

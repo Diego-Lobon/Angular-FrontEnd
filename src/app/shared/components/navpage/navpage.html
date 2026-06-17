@@ -1,6 +1,7 @@
 <div class="text-[1rem] mb-5">
     <span
         routerLink="/"
+        class="cursor-pointer"
         routerLinkActive="text-red-500 font-semibold"
         [routerLinkActiveOptions]="{ exact: true }"
     >
@@ -8,12 +9,12 @@
     </span>
     <span> / </span>
 
-    <span routerLink="/productos" routerLinkActive="text-red-500 font-semibold">
+    <span routerLink="/productos" class="cursor-pointer" routerLinkActive="text-red-500 font-semibold">
         Productos
     </span>
     <span> / </span>
 
-    <span routerLink="/cotizar" routerLinkActive="text-red-500 font-semibold">
+    <span routerLink="/cotizar" class="cursor-pointer" routerLinkActive="text-red-500 font-semibold">
         Cotizacion
     </span>
 </div>

@@ -1,66 +1,108 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
+import { environment } from '../../../environments/environment';
+import { PricelistService } from '../../core/services/pricelist.service';
+import { CartItem } from './cart-redis.service'; // 💡 Importa tu interfaz para mantener el tipado
 
 @Injectable({
     providedIn: 'root',
 })
 export class QuotationService {
-    private apiUrl = 'http://192.168.18.38:3000/quotation';
+    private http = inject(HttpClient);
+    private pricelistService = inject(PricelistService);
+    private apiUrl = `${environment.api_nest}/quotation`;
 
-    constructor(private http: HttpClient) {}
+    // 💡 Cambiamos 'any[]' por 'CartItem[]' para asegurar consistencia
+    generatePdf(
+        products: CartItem[],
+        username: string | null,
+        idPrecioLista: number | null,
+    ) {
+        const monedaActual = products[0]?.moneda || 'PEN';
 
-    // Visualizar PDF en una pestaña nueva (Ideal para PC y Móvil)
-    generatePdf(products: any[]) {
-        const body = { products: this.mapProductsToDto(products) };
+        const body = {
+            moneda: monedaActual,
+
+            username, // ← usar el parámetro recibido
+
+            id_precio_lista: idPrecioLista,
+
+            products: this.mapProductsToDto(products, monedaActual),
+        };
 
         return this.http
-            .post(`${this.apiUrl}/pdf`, body, { responseType: 'blob' })
+            .post(`${this.apiUrl}/pdf`, body, {
+                responseType: 'blob',
+            })
             .subscribe({
                 next: (blob) => {
-                    // Creamos la URL del archivo en la memoria del navegador
                     const url = window.URL.createObjectURL(blob);
-                    // Abre el visor de PDFs nativo del navegador (Chrome, Safari, etc.) en otra pestaña
                     window.open(url, '_blank');
                 },
-                error: (err) =>
-                    console.error('Error al visualizar el PDF:', err),
+                error: (err) => console.error('Error al visualizar PDF:', err),
             });
     }
 
-    // 📥 Descargar PDF directamente como archivo
-    generatePdfValid(products: any[]) {
-        const body = { products: this.mapProductsToDto(products) };
+    generatePdfValid(
+        products: CartItem[],
+        username: string | null,
+        idPrecioLista: number | null,
+    ) {
+        const monedaActual = products[0]?.moneda || 'PEN';
+
+        const body = {
+            moneda: monedaActual,
+
+            username,
+
+            id_precio_lista: idPrecioLista,
+
+            products: this.mapProductsToDto(products, monedaActual),
+        };
 
         return this.http
-            .post(`${this.apiUrl}/pdf-valid`, body, { responseType: 'blob' })
+            .post(`${this.apiUrl}/pdf-valid`, body, {
+                responseType: 'blob',
+            })
             .subscribe({
                 next: (blob) => {
                     const url = window.URL.createObjectURL(blob);
+
                     const a = document.createElement('a');
+
                     a.href = url;
+
                     a.download = 'cotizacion_validada.pdf';
+
                     document.body.appendChild(a);
+
                     a.click();
 
                     document.body.removeChild(a);
-                    window.URL.revokeObjectURL(url);
+
+                    URL.revokeObjectURL(url);
                 },
-                error: (err) =>
-                    console.error('Error al descargar el PDF:', err),
             });
     }
 
-    // Mapeador para cumplir con el DTO de NestJS
-    // Mapeador para cumplir con el DTO de NestJS
-    private mapProductsToDto(products: any[]): any[] {
-        return products.map((p) => ({
-            referencia_interna:
-                p.referencia_interna || p.codigo || 'REF-GENERICA',
-            nombre: p.nombre || p.name,
-            precio_venta: Number(p.precio_venta || p.price || 0),
+    // 💡 Mapeador optimizado usando las propiedades reales de tu CartItem
+    // quotation.service.ts (Angular)
+    private mapProductsToDto(products: CartItem[], moneda: string): any[] {
+        const esDolar = moneda === 'USD' || moneda.includes('USD');
 
-            // 💡 SOLUCON: Extrae 'cantidad' del CartItem y envíalo como 'cantidad' hacia el DTO de NestJS
-            cantidad: Number(p.cantidad || p.quantity || p.cant || 1),
-        }));
+        return products.map((p: any) => {
+            // 💡 Buscamos todas las variantes posibles en las que Redis o el tipado guarde el precio
+            const precioCorrecto = esDolar
+                ? p.price_dolares || p.precio_dolar || p.price || 0
+                : p.price_soles || p.precio_soles || p.price || 0;
+
+            return {
+                referencia_interna:
+                    p.referencia_interna || p.codigo || 'REF-GENERICA',
+                nombre: p.name || p.nombre,
+                precio_venta: Number(precioCorrecto), // Enviará el valor numérico exacto
+                cantidad: Number(p.cantidad || p.quantity || 1),
+            };
+        });
     }
 }

@@ -1,9 +1,11 @@
-@if(authService.isLoggedIn()){
+@if(showAdminNavbar()) {
 <app-admin-navbar />
-} @else {
+} @if(showClientNavbar()) {
 <app-navbar />
 }
+
 <router-outlet />
-@if(!authService.isLoggedIn()){
+
+@if(showFooter()) {
 <app-footer />
 }
