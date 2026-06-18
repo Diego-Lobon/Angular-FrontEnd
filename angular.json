@@ -31,7 +31,8 @@
                             "allowedHosts": []
                         },
                         "ssr": {
-                            "entry": "src/server.ts"
+                            "entry": "src/server.ts",
+                            "prerender": false
                         }
                     },
                     "configurations": {
