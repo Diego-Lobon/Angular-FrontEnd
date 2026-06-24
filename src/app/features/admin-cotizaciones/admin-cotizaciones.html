@@ -1,0 +1,267 @@
+<div
+    class="min-h-screen bg-slate-50/50 text-slate-800 antialiased selection:bg-black selection:text-white mt-16 px-4 py-8 lg:px-8"
+>
+    <div class="max-w-7xl mx-auto space-y-6">
+        <header
+            class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pb-5 border-b border-slate-200"
+        >
+            <div>
+                <h1
+                    class="text-2xl font-black tracking-tight text-slate-950 sm:text-3xl"
+                >
+                    Cotizaciones Recibidas
+                </h1>
+                <p class="text-xs text-slate-500 mt-1">
+                    Gestiona, valida y cambia el estado de los documentos
+                    enviados por los clientes.
+                </p>
+            </div>
+
+            <div class="flex gap-2 text-xs font-bold text-slate-600">
+                <span
+                    class="bg-amber-50 text-amber-700 border border-amber-200/60 px-2.5 py-1 rounded-lg"
+                    >Proceso</span
+                >
+                <span
+                    class="bg-emerald-50 text-emerald-700 border border-emerald-200/60 px-2.5 py-1 rounded-lg"
+                    >Aceptados</span
+                >
+                <span
+                    class="bg-rose-50 text-rose-700 border border-rose-200/60 px-2.5 py-1 rounded-lg"
+                    >Rechazados</span
+                >
+            </div>
+        </header>
+
+        <div
+            class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col sm:flex-row gap-3 items-center"
+        >
+            <div class="relative w-full sm:flex-1">
+                <mat-icon
+                    class="absolute left-3 top-2.5 text-slate-400 text-xl w-5 h-5"
+                    >search</mat-icon
+                >
+                <input
+                    type="text"
+                    placeholder="Buscar por ID, documento o cliente..."
+                    [ngModel]="filtroBusqueda()"
+                    (ngModelChange)="filtroBusqueda.set($event)"
+                    class="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-slate-400 transition-all"
+                />
+            </div>
+            <div class="w-full sm:w-auto">
+                <select
+                    [ngModel]="filtroEstado()"
+                    (ngModelChange)="filtroEstado.set($event)"
+                    class="w-full sm:w-44 px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:outline-none focus:border-slate-400 transition-all"
+                >
+                    <option value="TODOS">Todos los estados</option>
+                    <option value="PROCESO">En Proceso</option>
+                    <option value="ACEPTADO">Aceptado</option>
+                    <option value="RECHAZADO">Rechazado</option>
+                </select>
+            </div>
+        </div>
+
+        <div
+            class="hidden md:block bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden"
+        >
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr
+                        class="bg-slate-50 border-b border-slate-200 text-xs font-bold uppercase tracking-wider text-slate-500"
+                    >
+                        <th class="py-4 px-6 w-20">ID</th>
+                        <th class="py-4 px-6">Documento / Cotización</th>
+                        <th class="py-4 px-6">Cliente</th>
+                        <th class="py-4 px-6">Fecha Creación</th>
+                        <th class="py-4 px-6 text-center">Estado</th>
+                        <th class="py-4 px-6 text-center">Documento</th>
+                        <th class="py-4 px-6 text-center">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-150 text-sm">
+                    @for (item of cotizacionesFiltradas(); track item.id) {
+                    <tr
+                        class="hover:bg-slate-50/50 transition-colors border-slate-200/80"
+                    >
+                        <td
+                            class="py-4 px-6 font-mono font-bold text-slate-400"
+                        >
+                            #{{ item.id }}
+                        </td>
+
+                        <td class="py-4 px-6">
+                            <div class="flex flex-col">
+                                <span class="font-bold text-slate-900"
+                                    >{{ item.numero_cotizacion }}</span
+                                >
+                                <span class="text-xs text-slate-500 font-mono">
+                                    {{ item.tipo_documento }}: {{
+                                    item.numero_documento }}
+                                </span>
+                            </div>
+                        </td>
+
+                        <td class="py-4 px-6">
+                            <div class="flex flex-col">
+                                <span class="font-bold text-slate-900">
+                                    {{ item.razon_social }}
+                                </span>
+                                <span class="text-xs text-slate-500 font-mono">
+                                    {{ item.nombre_cliente }}
+                                </span>
+                            </div>
+                        </td>
+
+                        <td class="py-4 px-6 text-slate-600">
+                            {{ item.fecha_creacion | date:'dd/MM/yyyy HH:mm' }}
+                        </td>
+
+                        <td class="py-4 px-6">
+                            <div class="flex justify-center">
+                                <span
+                                    class="px-2 py-1 rounded-lg text-[10px] font-bold uppercase"
+                                    [ngClass]="{
+                            'bg-amber-50 text-amber-700': item.estado === 'PROCESO',
+                            'bg-emerald-50 text-emerald-700': item.estado === 'ACEPTADO',
+                            'bg-rose-50 text-rose-700': item.estado === 'RECHAZADO'
+                        }"
+                                >
+                                    {{ item.estado }}
+                                </span>
+                            </div>
+                        </td>
+
+                        <td class="py-4 px-6 text-center">
+                            <div class="flex gap-2 justify-center">
+                                <button
+                                    (click)="verPdf(item.pdf_url)"
+                                    title="Visualizar PDF"
+                                    class="text-slate-500 hover:text-slate-900 transition-colors"
+                                >
+                                    <mat-icon>visibility</mat-icon>
+                                </button>
+                                <button
+                                    (click)="descargarPdf(item.pdf_url, item.numero_cotizacion)"
+                                    title="Descargar PDF"
+                                    class="text-slate-500 hover:text-emerald-600 transition-colors"
+                                >
+                                    <mat-icon>download</mat-icon>
+                                </button>
+                            </div>
+                        </td>
+
+                        <td
+                            class="py-4 px-6 text-center flex gap-2 justify-center"
+                        >
+                            <button
+                                [routerLink]="['/valid-cotizacion', item.id]"
+                                class="bg-slate-950 hover:bg-slate-800 text-white font-bold text-xs px-3 py-2 rounded-xl transition-all"
+                            >
+                                Validar
+                            </button>
+                            <button
+                                (click)="eliminarCotizacion(item.id)"
+                                class="bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold text-xs px-3 py-2 rounded-xl transition-all"
+                            >
+                                <mat-icon class="text-[1.2rem]! w-auto! h-auto!"
+                                    >delete</mat-icon
+                                >
+                            </button>
+                        </td>
+                    </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <div class="grid grid-cols-1 gap-4 md:hidden">
+            @for (item of cotizacionesFiltradas(); track item.id) {
+            <div
+                class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm space-y-4"
+            >
+                <div class="flex justify-between items-start">
+                    <div class="flex items-center gap-2.5">
+                        <div class="p-2 bg-slate-100 rounded-lg text-slate-600">
+                            <mat-icon class="block">description</mat-icon>
+                        </div>
+                        <div>
+                            <h4
+                                class="font-bold text-slate-900 text-sm max-w-[180px] truncate"
+                            >
+                                {{ item.numero_cotizacion }}
+                            </h4>
+                            <p class="text-xs text-slate-500">
+                                {{ item.nombre_cliente }}
+                            </p>
+                        </div>
+                    </div>
+                    <span class="text-xs font-mono font-bold text-slate-400"
+                        >#{{ item.id }}</span
+                    >
+                </div>
+
+                <div class="space-y-1.5">
+                    <span
+                        class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block"
+                        >Estado del Documento</span
+                    >
+                    <div
+                        class="relative flex bg-slate-100 p-1 rounded-xl w-full h-9 border border-slate-200/40"
+                    >
+                        <div
+                            class="absolute top-1 bottom-1 left-1 w-[31%] rounded-lg transition-all duration-300 shadow-sm"
+                            [ngClass]="{
+                                'left-[1%] bg-amber-500': item.estado === 'PROCESO',
+                                'left-[34.5%] bg-emerald-600': item.estado === 'ACEPTADO',
+                                'left-[68%] bg-rose-600': item.estado === 'RECHAZADO'
+                            }"
+                        ></div>
+                        <button
+                            (click)="cambiarEstado(item.id, 'PROCESO')"
+                            class="relative z-15 flex-1 text-center text-xs font-bold transition-colors"
+                            [ngClass]="item.estado === 'PROCESO' ? 'text-white' : 'text-slate-500'"
+                        >
+                            Proceso
+                        </button>
+                        <button
+                            (click)="cambiarEstado(item.id, 'ACEPTADO')"
+                            class="relative z-15 flex-1 text-center text-xs font-bold transition-colors"
+                            [ngClass]="item.estado === 'ACEPTADO' ? 'text-white' : 'text-slate-500'"
+                        >
+                            Aceptar
+                        </button>
+                        <button
+                            (click)="cambiarEstado(item.id, 'RECHAZADO')"
+                            class="relative z-15 flex-1 text-center text-xs font-bold transition-colors"
+                            [ngClass]="item.estado === 'RECHAZADO' ? 'text-white' : 'text-slate-500'"
+                        >
+                            Rechazar
+                        </button>
+                    </div>
+                </div>
+
+                <div class="pt-2 border-t border-slate-100">
+                    <button
+                        [routerLink]="['/validate-pdf', item.id]"
+                        class="w-full flex items-center justify-center gap-1.5 bg-slate-950 hover:bg-slate-800 text-white font-bold text-xs py-2.5 rounded-xl transition-all"
+                    >
+                        <span>Validar Documento</span>
+                        <mat-icon class="text-sm! w-4! h-4!"
+                            >arrow_forward</mat-icon
+                        >
+                    </button>
+                </div>
+            </div>
+            } @empty {
+            <div
+                class="text-center py-12 text-slate-400 text-sm bg-white rounded-2xl border border-slate-200"
+            >
+                No se encontraron documentos con los criterios de búsqueda
+                actuales.
+            </div>
+            }
+        </div>
+    </div>
+</div>

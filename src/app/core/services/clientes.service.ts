@@ -11,6 +11,10 @@ export interface Cliente {
 
     nombre: string;
 
+    username: string;
+
+    password: string;
+
     correo: string;
 
     celular: number;
@@ -40,5 +44,16 @@ export class ClientesService {
                 id_precio_lista: idPrecioLista,
             },
         );
+    }
+
+    actualizarCliente(
+        id: number,
+        cliente: Partial<Cliente>,
+    ): Observable<Cliente> {
+        return this.http.patch<Cliente>(`${this.api}/${id}`, cliente);
+    }
+
+    obtenerClientePorId(id: number): Observable<Cliente> {
+        return this.http.get<Cliente>(`${this.api}/${id}`);
     }
 }

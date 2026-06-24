@@ -1,36 +1,36 @@
-import { Component } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
+import { AuthService } from '../../core/services/auth.service'; // Asegura la ruta correcta de tu servicio
 
-interface Usuario {
-    id: number;
-    nombre: string;
-    email: string;
-    rol: string;
-    avatar: string;
-}
 @Component({
     selector: 'app-admin-users',
     imports: [MatIconModule, CommonModule],
     templateUrl: './admin-users.html',
     styleUrl: './admin-users.css',
 })
-export class AdminUsers {
-    // Dos datos de ejemplo tal como solicitaste
-    usuariosPrueba: Usuario[] = [
-        {
-            id: 1,
-            nombre: 'Carlos Mendoza',
-            email: '',
-            rol: 'Administrador',
-            avatar: 'CM',
-        },
-        {
-            id: 2,
-            nombre: 'Ana Luisa Gomez',
-            email: 'ana.gomez@email.com',
-            rol: 'Editor',
-            avatar: 'AG',
-        },
-    ];
+export class AdminUsers implements OnInit {
+    private authService = inject(AuthService);
+
+    // Cambiamos el array estático por un Signal
+    readonly usuarios = signal<any[]>([]);
+    readonly loading = signal<boolean>(true);
+
+    ngOnInit() {
+        this.cargarUsuarios();
+    }
+
+    cargarUsuarios() {
+        this.loading.set(true);
+        this.authService.getUsuarios().subscribe({
+            next: (data) => {
+                this.usuarios.set(data);
+                this.loading.set(false);
+            },
+            error: (err) => {
+                console.error('Error al cargar usuarios:', err);
+                this.loading.set(false);
+            },
+        });
+    }
 }

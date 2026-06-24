@@ -27,6 +27,8 @@ interface SelectedProductListItem {
     id: number; // Forzamos a que sea estrictamente number para coincidir con PricelistProduct
     codigo: string;
     nombre: string;
+    categoria: string;
+    marca: string;
     precioEditable: number;
     descuentoEditable: number;
     precioSolesBD: number;
@@ -208,6 +210,8 @@ export class CreateListPrice {
                     id: Number(product.id),
                     codigo: product.referencia_interna || 'SIN-CODIGO',
                     nombre: product.nombre,
+                    categoria: product.categoria.nombre,
+                    marca: product.marca.nombre,
                     precioEditable: precioInicial,
                     descuentoEditable: descuento,
                     precioSolesBD: precioSoles,
@@ -273,6 +277,8 @@ export class CreateListPrice {
                 id: p.id,
                 codigo: p.codigo,
                 nombre: p.nombre,
+                marca: p.marca,
+                categoria: p.nombre,
                 precioEditable: p.precioEditable,
                 descuentoEditable: p.descuentoEditable,
                 tipoRegla: p.tipoRegla,

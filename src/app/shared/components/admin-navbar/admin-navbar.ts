@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
-import { AuthService } from '../../../core/services/auth';
+import { AuthService } from '../../../core/services/auth.service';
 import { Router, RouterModule } from '@angular/router';
 
 @Component({
@@ -15,6 +15,10 @@ export class AdminNavbar {
         private router: Router,
     ) {}
     isMenuOpen = false;
+
+    get usuarioLogueado() {
+        return this.authService.getUserData();
+    }
 
     toggleMenu() {
         this.isMenuOpen = !this.isMenuOpen;

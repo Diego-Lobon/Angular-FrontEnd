@@ -11,6 +11,8 @@ export interface PricelistProduct {
     id: number;
     codigo: string;
     nombre: string;
+    marca: string;
+    categoria: string;
     precioEditable: number;
     descuentoEditable: number;
     tipoRegla: 'DESCUENTO' | 'PRECIO_FIJO';

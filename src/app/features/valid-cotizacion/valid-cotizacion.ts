@@ -5,6 +5,7 @@ import {
     HostListener,
     OnInit,
     DestroyRef,
+    ChangeDetectorRef,
 } from '@angular/core';
 
 import { MatIconModule } from '@angular/material/icon';
@@ -22,6 +23,9 @@ import {
     PriceListItem,
 } from './../../core/services/pricelist.service';
 import { AuthClienteService } from '../../core/services/auth-cliente.service';
+import { ActivatedRoute } from '@angular/router'; // 1. Importa ActivatedRoute
+import { environment } from '../../../environments/environment';
+import { QuotationService } from '../../core/services/quotation.service';
 
 @Component({
     selector: 'app-valid-cotizacion',
@@ -65,6 +69,11 @@ export class ValidCotizacion implements OnInit {
     private pdfValidationService = inject(PdfValidationService);
     private quotationCreateService = inject(QuotationCreateService);
     private pricelistService = inject(PricelistService);
+    private quotationAutomatic = inject(QuotationService);
+
+    private route = inject(ActivatedRoute);
+
+    private cdr = inject(ChangeDetectorRef);
 
     quotationForm = this.fb.group({
         cliente: ['', Validators.required],
@@ -72,6 +81,8 @@ export class ValidCotizacion implements OnInit {
         terminoPago: ['', Validators.required],
         observacion: [''],
     });
+
+    pdfUrl: string = '';
 
     ngOnInit() {
         // Cargar clientes UNA SOLA VEZ
@@ -106,14 +117,53 @@ export class ValidCotizacion implements OnInit {
         this.pricelistService.obtenerListas().subscribe({
             next: (res: PriceListItem[]) => {
                 this.listasPrecio.set(res);
-
-                this.seleccionarListaPorDefectoJwt();
             },
 
             error: (err) => console.error('Error cargando listas', err),
         });
+
+        this.route.paramMap.subscribe((params) => {
+            const id = params.get('id');
+            if (id) {
+                this.cargarCotizacionPorId(id);
+            }
+        });
     }
 
+    // Dentro de tu clase ValidCotizacion
+
+    // En valid-cotizacion.ts
+    private async cargarCotizacionPorId(id: string) {
+        this.isLoading.set(true);
+        try {
+            const response = await fetch(
+                `${environment.api_nest}/quotation/download/${id}`,
+            );
+
+            if (!response.ok) throw new Error('No se pudo descargar');
+
+            // 💡 1. Obtenemos el nombre desde nuestro header personalizado
+            const fileName =
+                response.headers.get('X-File-Name') || `cotizacion_${id}.pdf`;
+
+            const blob = await response.blob();
+
+            // 2. Usamos el nombre real para crear el objeto File
+            this.selectedFile = new File([blob], fileName, {
+                type: 'application/pdf',
+            });
+
+            console.log('Archivo cargado con nombre:', fileName);
+
+            this.showQuotationForm.set(true);
+            this.cdr.detectChanges();
+        } catch (err: any) {
+            console.error('Error al cargar:', err);
+        } finally {
+            this.isLoading.set(false);
+        }
+    }
+    
     private cargarClientesIniciales() {
         this.quotationCreateService.buscarClientes('').subscribe({
             next: (res: any) => {
@@ -294,8 +344,8 @@ export class ValidCotizacion implements OnInit {
     }
 
     private seleccionarListaSegunPdf(idPrecioPdf: number | null) {
-        // Si vino ID del PDF → usar ese
-        if (idPrecioPdf) {
+        // Validamos que venga un ID real y mayor a 0
+        if (idPrecioPdf && idPrecioPdf > 0) {
             const lista = this.listasPrecio().find(
                 (l) => Number(l.id) === Number(idPrecioPdf),
             );
@@ -304,12 +354,21 @@ export class ValidCotizacion implements OnInit {
                 this.quotationForm.patchValue({
                     listaPrecio: lista.name,
                 });
-
-                return;
+                return; // Detiene la ejecución aquí si todo fue exitoso
             }
         }
 
-        // Si no vino → volver al JWT
-        this.seleccionarListaPorDefectoJwt();
+        // 💡 SOLUCIÓN: Si el PDF marca 0, null o la lista no existe en Odoo:
+        console.log(
+            'El PDF no especificó una tarifa válida (marcó 0 o null). Reseteando campo...',
+        );
+
+        this.quotationForm.patchValue({
+            listaPrecio: '', // Esto hace que el <select> regrese visualmente a "Seleccione una lista"
+        });
+
+        // Opcional: Si aun así quieres intentar aplicar el JWT por defecto en vez de dejarlo vacío,
+        // puedes descomentar la línea de abajo:
+        // this.seleccionarListaPorDefectoJwt();
     }
 }

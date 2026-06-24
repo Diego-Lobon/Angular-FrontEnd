@@ -1,85 +1,175 @@
 <nav
-    class="fixed top-0 left-0 w-full z-40 bg-white flex justify-between px-6 py-2 shadow-[0_4px_6px_-1px_rgba(0,0,0,0.1)]"
+    class="fixed top-0 left-0 w-full z-40 bg-white/90 backdrop-blur-md border-b border-slate-100 flex items-center justify-between px-4 sm:px-8 h-16 shadow-xs select-none"
 >
-    <img
-        routerLink="/"
-        class="h-16 cursor-pointer"
-        src="assets/logos/logo-isur.png"
-        alt="Logo-ISUR"
-    />
-    <div class="flex gap-3 header-responsive-button">
-        <a class="m-auto" routerLink="/cotizar">
-            <mat-icon class="text-3xl! w-auto! h-auto! text-red-600!"
-                >shopping_cart</mat-icon
+    <div class="flex items-center gap-8">
+        <img
+            routerLink="/"
+            class="h-10 sm:h-11 w-auto object-contain cursor-pointer transition-transform duration-200 active:scale-98"
+            src="assets/logos/logo-isur.png"
+            alt="Logo ISUR"
+        />
+
+        <div
+            class="hidden md:flex items-center gap-6 text-sm font-semibold text-slate-600"
+        >
+            <a
+                routerLink="/"
+                routerLinkActive="text-slate-900 border-b-2 border-slate-900"
+                [routerLinkActiveOptions]="{exact: true}"
+                class="py-5 transition-colors hover:text-black"
             >
+                Inicio
+            </a>
+            <a
+                routerLink="/productos"
+                routerLinkActive="text-slate-900 border-b-2 border-slate-900"
+                class="py-5 transition-colors hover:text-black"
+            >
+                Productos
+            </a>
+            <a
+                routerLink="/cotizar"
+                routerLinkActive="text-slate-900 border-b-2 border-slate-900"
+                class="py-5 transition-colors hover:text-black"
+            >
+                Cotización
+            </a>
+        </div>
+    </div>
+
+    <div class="flex items-center gap-2 sm:gap-4">
+        <a
+            routerLink="/cotizar"
+            class="p-2 text-slate-700 hover:bg-slate-50 rounded-xl transition-colors relative flex items-center justify-center group"
+            title="Ver cotización"
+        >
+            <mat-icon
+                class="text-2xl! w-6! h-6! flex items-center justify-center text-slate-800 group-hover:text-black"
+            >
+                shopping_cart
+            </mat-icon>
+            <span
+                class="absolute top-1 right-1 w-2 h-2 bg-rose-600 rounded-full animate-pulse"
+            ></span>
         </a>
+
+        <div class="hidden md:flex items-center gap-3">
+            @if(authClienteService.isLoggedIn()){
+            <button
+                (click)="logout()"
+                type="button"
+                class="text-xs font-bold text-slate-600 hover:text-rose-600 px-3 py-2 rounded-xl transition-colors cursor-pointer"
+            >
+                Cerrar Sesión
+            </button>
+            } @else {
+            <a
+                routerLink="/login"
+                class="text-xs font-bold bg-slate-900 hover:bg-black text-white px-4 py-2.5 rounded-xl transition-all shadow-xs active:scale-98 text-center"
+            >
+                Iniciar Sesión
+            </a>
+            }
+        </div>
+
         <button
             (click)="toggleMenu()"
+            type="button"
             id="menu-btn"
-            class="m-auto w-10 hover:bg-gray-200 active:bg-gray-200 rounded-[0.2rem]"
+            class="flex md:hidden items-center justify-center w-10 h-10 text-slate-800 hover:bg-slate-50 active:bg-slate-100 rounded-xl transition-colors cursor-pointer"
         >
-            <mat-icon class="text-3xl! w-auto! h-auto!">menu</mat-icon>
+            <mat-icon
+                class="text-2xl! w-6! h-6! flex items-center justify-center"
+            >
+                {{ isMenuOpen ? 'close' : 'menu' }}
+            </mat-icon>
         </button>
     </div>
 </nav>
 
-<!-- OVERLAY -->
+<div class="h-16"></div>
 
 @if(isMenuOpen) {
-
-<div class="fixed inset-0 bg-black/40 z-40" (click)="closeMenu()"></div>
-
+<div
+    class="fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-40 transition-opacity duration-300 md:hidden"
+    (click)="closeMenu()"
+></div>
 }
 
-<!-- SIDEBAR -->
-
-<div
-    class="fixed top-0 right-0 h-screen w-72 bg-white z-60 p-6 transition-transform duration-300"
+<aside
+    class="fixed top-0 right-0 h-screen w-72 bg-white z-50 p-6 flex flex-col justify-between transition-transform duration-300 ease-out md:hidden border-l border-slate-100 shadow-2xl"
     [class.translate-x-full]="!isMenuOpen"
     [class.translate-x-0]="isMenuOpen"
-    [class.shadow-2xl]="isMenuOpen"
 >
-    <!-- HEADER -->
-
-    <div class="flex justify-between items-center mb-10">
-        <h2 class="text-2xl font-bold">Menú</h2>
-
-        <button
-            (click)="closeMenu()"
-            class="flex items-center justify-center w-10 h-10 rounded-md hover:bg-gray-200 active:bg-gray-300"
+    <div class="space-y-8">
+        <div
+            class="flex justify-between items-center border-b border-slate-100 pb-4"
         >
-            <mat-icon> close </mat-icon>
-        </button>
+            <h2 class="text-base font-extrabold text-slate-900 tracking-tight">
+                Navegación
+            </h2>
+            <button
+                (click)="closeMenu()"
+                type="button"
+                class="flex items-center justify-center w-8 h-8 rounded-lg text-slate-400 hover:bg-slate-50 active:bg-slate-100"
+            >
+                <mat-icon class="text-xl!">close</mat-icon>
+            </button>
+        </div>
+
+        <nav class="flex flex-col gap-2">
+            <a
+                routerLink="/"
+                (click)="closeMenu()"
+                routerLinkActive="bg-slate-50 text-slate-900 font-bold"
+                [routerLinkActiveOptions]="{exact: true}"
+                class="flex items-center gap-3 px-4 py-3 text-slate-600 rounded-xl font-medium transition-colors hover:bg-slate-50"
+            >
+                <mat-icon class="text-lg! w-4! h-4!">home</mat-icon>
+                <span>Inicio</span>
+            </a>
+
+            <a
+                routerLink="/productos"
+                (click)="closeMenu()"
+                routerLinkActive="bg-slate-50 text-slate-900 font-bold"
+                class="flex items-center gap-3 px-4 py-3 text-slate-600 rounded-xl font-medium transition-colors hover:bg-slate-50"
+            >
+                <mat-icon class="text-lg! w-4! h-4!">layers</mat-icon>
+                <span>Productos</span>
+            </a>
+
+            <a
+                routerLink="/cotizar"
+                (click)="closeMenu()"
+                routerLinkActive="bg-slate-50 text-slate-900 font-bold"
+                class="flex items-center gap-3 px-4 py-3 text-slate-600 rounded-xl font-medium transition-colors hover:bg-slate-50"
+            >
+                <mat-icon class="text-lg! w-4! h-4!">description</mat-icon>
+                <span>Cotización</span>
+            </a>
+        </nav>
     </div>
 
-    <!-- LINKS -->
-
-    <div class="flex flex-col gap-6 text-lg">
-        <a routerLink="/" (click)="closeMenu()"> Inicio </a>
-
-        <a routerLink="/productos" (click)="closeMenu()"> Productos </a>
-
-        <a routerLink="/cotizar" (click)="closeMenu()"> Cotización </a>
-
+    <div class="border-t border-slate-100 pt-4">
         @if(authClienteService.isLoggedIn()){
-
         <button
             (click)="closeMenu(); logout()"
-            class="bg-black text-white rounded-[0.4rem] p-1 text-center hover:bg-gray-500 active:bg-gray-500"
+            type="button"
+            class="w-full flex items-center justify-center gap-2 bg-rose-50 hover:bg-rose-100 active:bg-rose-200 text-rose-600 font-bold py-3 rounded-xl transition-colors cursor-pointer text-sm"
         >
+            <mat-icon class="text-sm! w-4! h-4!">logout</mat-icon>
             Cerrar Sesión
         </button>
-
         } @else {
-
         <a
             routerLink="/login"
             (click)="closeMenu()"
-            class="bg-black text-white rounded-[0.4rem] p-1 text-center hover:bg-gray-500 active:bg-gray-500"
+            class="w-full flex items-center justify-center gap-2 bg-slate-900 hover:bg-black text-white font-bold py-3 rounded-xl transition-all text-sm text-center shadow-xs active:scale-[0.99]"
         >
+            <mat-icon class="text-sm! w-4! h-4!">login</mat-icon>
             Iniciar Sesión
         </a>
-
         }
     </div>
-</div>
+</aside>

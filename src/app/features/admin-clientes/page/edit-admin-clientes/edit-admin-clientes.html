@@ -1,0 +1,125 @@
+<div class="mt-16 min-h-screen bg-slate-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-2xl mx-auto">
+        <div class="mb-8">
+            <a
+                routerLink="/home-clientes"
+                class="text-slate-500 hover:text-black flex items-center gap-1 text-sm font-medium mb-4"
+            >
+                <mat-icon class="text-base">arrow_back</mat-icon> Volver a la
+                lista
+            </a>
+            <h1 class="text-3xl font-extrabold text-slate-900">
+                Editar Cliente
+            </h1>
+            <p class="text-slate-500 mt-2">
+                Actualiza la información corporativa del cliente.
+            </p>
+        </div>
+
+        @if (loading()) {
+        <div class="text-center py-20 text-slate-400">Cargando datos...</div>
+        } @else {
+        <form
+            [formGroup]="editForm"
+            (ngSubmit)="onSubmit()"
+            class="bg-white p-6 md:p-8 rounded-2xl border border-slate-200 shadow-sm"
+        >
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="col-span-2">
+                    <label
+                        class="block text-xs font-bold uppercase text-slate-500 mb-2"
+                        >Nombre Comercial</label
+                    >
+                    <input
+                        formControlName="nombre"
+                        class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 outline-none focus:border-black transition-all"
+                    />
+                </div>
+
+                <div>
+                    <label
+                        class="block text-xs font-bold uppercase text-slate-500 mb-2"
+                        >Usuario</label
+                    >
+                    <input
+                        formControlName="username"
+                        class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 outline-none focus:border-black transition-all"
+                    />
+                </div>
+
+                <div>
+                    <label
+                        class="block text-xs font-bold uppercase text-slate-500 mb-2"
+                        >Celular</label
+                    >
+                    <input
+                        formControlName="celular"
+                        class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 outline-none focus:border-black transition-all"
+                    />
+                </div>
+
+                <div class="col-span-2">
+                    <label
+                        class="block text-xs font-bold uppercase text-slate-500 mb-2"
+                        >Correo Electrónico</label
+                    >
+                    <input
+                        formControlName="correo"
+                        type="email"
+                        class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 outline-none focus:border-black transition-all"
+                    />
+                </div>
+                <!-- Pon esto debajo del campo de Correo Electrónico y antes de la Lista de precios -->
+                <div class="col-span-2">
+                    <label
+                        class="block text-xs font-bold uppercase text-slate-500 mb-2"
+                    >
+                        Nueva Contraseña (Dejar en blanco para mantener la
+                        actual)
+                    </label>
+                    <input
+                        formControlName="password"
+                        type="password"
+                        placeholder="••••••••"
+                        class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 outline-none focus:border-black transition-all"
+                    />
+                </div>
+
+                <div class="col-span-2 pt-6 border-t border-slate-200">
+                    <label
+                        class="block text-xs font-bold uppercase text-slate-500 mb-2"
+                    >
+                        Lista de precios asignada
+                    </label>
+                    <select
+                        formControlName="id_precio_lista"
+                        class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 outline-none focus:border-black transition-all appearance-none cursor-pointer"
+                    >
+                        <option [value]="null">Sin lista asignada</option>
+                        @for (lista of listasPrecios(); track lista.id) {
+                        <option [value]="lista.id">{{ lista.name }}</option>
+                        }
+                    </select>
+                </div>
+            </div>
+
+            <div class="mt-8 flex justify-end gap-3">
+                <button
+                    type="button"
+                    routerLink="/home-clientes"
+                    class="px-6 py-3 rounded-xl font-bold text-slate-600 hover:bg-slate-100 transition-all"
+                >
+                    Cancelar
+                </button>
+                <button
+                    type="submit"
+                    [disabled]="editForm.invalid"
+                    class="px-6 py-3 rounded-xl font-bold bg-black text-white hover:bg-slate-800 transition-all disabled:opacity-50"
+                >
+                    Guardar Cambios
+                </button>
+            </div>
+        </form>
+        }
+    </div>
+</div>

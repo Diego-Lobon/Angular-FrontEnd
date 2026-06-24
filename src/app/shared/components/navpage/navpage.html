@@ -1,20 +1,63 @@
-<div class="text-[1rem] mb-5">
-    <span
-        routerLink="/"
-        class="cursor-pointer"
-        routerLinkActive="text-red-500 font-semibold"
-        [routerLinkActiveOptions]="{ exact: true }"
+<nav
+    class="w-full py-3.5 px-4 sm:px-6 bg-slate-50 border-b border-slate-200/60 flex items-center overflow-x-auto scrollbar-none select-none"
+    aria-label="Breadcrumb"
+>
+    <ol
+        class="flex items-center gap-2 whitespace-nowrap text-xs font-semibold tracking-tight text-slate-500"
     >
-        Inicio
-    </span>
-    <span> / </span>
+        <li class="flex items-center gap-2">
+            <a
+                routerLink="/"
+                routerLinkActive="text-slate-900 font-bold pointer-events-none"
+                [routerLinkActiveOptions]="{ exact: true }"
+                class="flex items-center gap-1.5 hover:text-slate-900 transition-colors duration-150"
+            >
+                <mat-icon
+                    class="text-base! w-auto! h-auto! flex items-center justify-center"
+                    >home</mat-icon
+                >
+                <span>Inicio</span>
+            </a>
+        </li>
 
-    <span routerLink="/productos" class="cursor-pointer" routerLinkActive="text-red-500 font-semibold">
-        Productos
-    </span>
-    <span> / </span>
+        <li class="text-slate-300 flex items-center" aria-hidden="true">
+            <mat-icon
+                class="text-sm! w-4! h-4! flex items-center justify-center"
+                >chevron_right</mat-icon
+            >
+        </li>
 
-    <span routerLink="/cotizar" class="cursor-pointer" routerLinkActive="text-red-500 font-semibold">
-        Cotizacion
-    </span>
-</div>
+        <li class="flex items-center gap-2">
+            <a
+                routerLink="/productos"
+                routerLinkActive="text-slate-900 font-bold pointer-events-none"
+                [routerLinkActiveOptions]="{ exact: true }"
+                class="hover:text-slate-900 transition-colors duration-150"
+            >
+                Productos
+            </a>
+        </li>
+
+        @if (isInCotizar()) {
+        <li
+            class="text-slate-300 flex items-center animate-fadeIn"
+            aria-hidden="true"
+        >
+            <mat-icon
+                class="text-sm! w-4! h-4! flex items-center justify-center"
+                >chevron_right</mat-icon
+            >
+        </li>
+
+        <li class="flex items-center gap-2 animate-fadeIn">
+            <a
+                routerLink="/cotizar"
+                routerLinkActive="text-slate-900 font-bold pointer-events-none"
+                class="hover:text-slate-900 transition-colors duration-150"
+            >
+                Cotización
+            </a>
+        </li>
+        }
+    </ol>
+</nav>

@@ -1,3 +1,279 @@
-<div class="mt-20 px-4 py-10">
-    
+<div
+    class="mt-16 bg-slate-50 min-h-screen text-slate-800 antialiased selection:bg-black selection:text-white"
+>
+    <div class="max-w-6xl mx-auto px-4 py-8 lg:px-6 animate-fade-in space-y-8">
+        <header
+            class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-slate-200"
+        >
+            <div>
+                <h1
+                    class="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl"
+                >
+                    Panel de Administración
+                </h1>
+                <p class="text-sm text-slate-500 mt-1">
+                    Monitorea el inventario, gestiona tarifas para este ciclo
+                    2026 y procesa cotizaciones directamente con Odoo.
+                </p>
+            </div>
+            <div
+                class="inline-flex items-center gap-2 bg-emerald-50 border border-emerald-200/60 rounded-xl px-3 py-1.5 self-start sm:self-auto"
+            >
+                <span
+                    class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"
+                ></span>
+                <span
+                    class="text-[11px] font-mono font-bold text-emerald-800 uppercase tracking-wider"
+                    >Odoo ERP Conectado</span
+                >
+            </div>
+        </header>
+
+        <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div
+                class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4"
+            >
+                <div
+                    class="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-slate-700"
+                >
+                    <mat-icon>inventory_2</mat-icon>
+                </div>
+                <div>
+                    <p
+                        class="text-[10px] uppercase font-bold tracking-wider text-slate-400"
+                    >
+                        Productos Activos
+                    </p>
+                    <p class="text-xl font-bold text-slate-900 mt-0.5">1,420</p>
+                </div>
+            </div>
+
+            <div
+                class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4"
+            >
+                <div
+                    class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600"
+                >
+                    <mat-icon>monetization_on</mat-icon>
+                </div>
+                <div>
+                    <p
+                        class="text-[10px] uppercase font-bold tracking-wider text-slate-400"
+                    >
+                        Listas Activas
+                    </p>
+                    <p class="text-xl font-bold text-slate-900 mt-0.5">
+                        4 Tarifas
+                    </p>
+                </div>
+            </div>
+
+            <div
+                class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4"
+            >
+                <div
+                    class="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-600"
+                >
+                    <mat-icon>assignment_turned_in</mat-icon>
+                </div>
+                <div>
+                    <p
+                        class="text-[10px] uppercase font-bold tracking-wider text-slate-400"
+                    >
+                        Validaciones Hoy
+                    </p>
+                    <p class="text-xl font-bold text-slate-900 mt-0.5">
+                        28 PDFs
+                    </p>
+                </div>
+            </div>
+
+            <div
+                class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4"
+            >
+                <div
+                    class="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center text-amber-600"
+                >
+                    <mat-icon>business</mat-icon>
+                </div>
+                <div>
+                    <p
+                        class="text-[10px] uppercase font-bold tracking-wider text-slate-400"
+                    >
+                        Clientes Odoo
+                    </p>
+                    <p class="text-xl font-bold text-slate-900 mt-0.5">348</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="space-y-4">
+            <h2
+                class="text-xs font-bold text-slate-400 uppercase tracking-wider"
+            >
+                Acceso Rápido a Herramientas
+            </h2>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <a
+                    routerLink="/valid-cotizacion"
+                    class="group bg-white rounded-2xl border border-slate-200 shadow-sm p-5 hover:border-slate-900 hover:shadow-md transition-all duration-200 flex flex-col justify-between h-44"
+                >
+                    <div class="space-y-2">
+                        <div
+                            class="w-9 h-9 rounded-xl bg-slate-900 text-white flex items-center justify-center group-hover:scale-105 transition-transform"
+                        >
+                            <mat-icon class="text-sm"
+                                >playlist_add_check</mat-icon
+                            >
+                        </div>
+                        <h3
+                            class="text-sm font-bold text-slate-900 group-hover:text-black"
+                        >
+                            Validar PDF de Stock
+                        </h3>
+                        <p class="text-xs text-slate-400 leading-snug">
+                            Sube una cotización, extrae códigos automáticamente
+                            y comprueba inventario en tiempo real.
+                        </p>
+                    </div>
+                    <span
+                        class="text-[11px] font-bold text-slate-900 flex items-center gap-1 mt-2"
+                    >
+                        Ejecutar validador
+                        <mat-icon
+                            class="text-xs! w-3.5! h-3.5! transition-transform group-hover:translate-x-1"
+                            >arrow_forward</mat-icon
+                        >
+                    </span>
+                </a>
+
+                <a
+                    routerLink="/home-list-price"
+                    class="group bg-white rounded-2xl border border-slate-200 shadow-sm p-5 hover:border-slate-900 hover:shadow-md transition-all duration-200 flex flex-col justify-between h-44"
+                >
+                    <div class="space-y-2">
+                        <div
+                            class="w-9 h-9 rounded-xl bg-slate-900 text-white flex items-center justify-center group-hover:scale-105 transition-transform"
+                        >
+                            <mat-icon class="text-sm">price_change</mat-icon>
+                        </div>
+                        <h3
+                            class="text-sm font-bold text-slate-900 group-hover:text-black"
+                        >
+                            Listas de Precios
+                        </h3>
+                        <p class="text-xs text-slate-400 leading-snug">
+                            Gestiona categorizaciones, márgenes de utilidad y
+                            asignación de descuentos masivos.
+                        </p>
+                    </div>
+                    <span
+                        class="text-[11px] font-bold text-slate-900 flex items-center gap-1 mt-2"
+                    >
+                        Administrar tarifas
+                        <mat-icon
+                            class="text-xs! w-3.5! h-3.5! transition-transform group-hover:translate-x-1"
+                            >arrow_forward</mat-icon
+                        >
+                    </span>
+                </a>
+
+                <a
+                    routerLink="/admin-products"
+                    class="group bg-white rounded-2xl border border-slate-200 shadow-sm p-5 hover:border-slate-900 hover:shadow-md transition-all duration-200 flex flex-col justify-between h-44"
+                >
+                    <div class="space-y-2">
+                        <div
+                            class="w-9 h-9 rounded-xl bg-slate-900 text-white flex items-center justify-center group-hover:scale-105 transition-transform"
+                        >
+                            <mat-icon class="text-sm">inventory</mat-icon>
+                        </div>
+                        <h3
+                            class="text-sm font-bold text-slate-900 group-hover:text-black"
+                        >
+                            Maestro de Productos
+                        </h3>
+                        <p class="text-xs text-slate-400 leading-snug">
+                            Edita SKU rápidos, vinculación de marcas, nombres y
+                            sincronización de costos base.
+                        </p>
+                    </div>
+                    <span
+                        class="text-[11px] font-bold text-slate-900 flex items-center gap-1 mt-2"
+                    >
+                        Abrir almacén
+                        <mat-icon
+                            class="text-xs! w-3.5! h-3.5! transition-transform group-hover:translate-x-1"
+                            >arrow_forward</mat-icon
+                        >
+                    </span>
+                </a>
+
+                <a
+                    routerLink="/admin-customers"
+                    class="group bg-white rounded-2xl border border-slate-200 shadow-sm p-5 hover:border-slate-900 hover:shadow-md transition-all duration-200 flex flex-col justify-between h-44"
+                >
+                    <div class="space-y-2">
+                        <div
+                            class="w-9 h-9 rounded-xl bg-slate-100 text-slate-700 group-hover:bg-slate-900 group-hover:text-white flex items-center justify-center transition-all"
+                        >
+                            <mat-icon class="text-sm">contacts</mat-icon>
+                        </div>
+                        <h3
+                            class="text-sm font-bold text-slate-900 group-hover:text-black"
+                        >
+                            Clientes
+                        </h3>
+                        <p class="text-xs text-slate-400 leading-snug">
+                            Consulta de cuentas comerciales sincronizadas y
+                            términos de crédito parametrizados.
+                        </p>
+                    </div>
+                    <span
+                        class="text-[11px] font-bold text-slate-400 group-hover:text-slate-900 flex items-center gap-1 mt-2 transition-colors"
+                    >
+                        Ver directorio
+                        <mat-icon
+                            class="text-xs! w-3.5! h-3.5! transition-transform group-hover:translate-x-1"
+                            >arrow_forward</mat-icon
+                        >
+                    </span>
+                </a>
+
+                <a
+                    routerLink="/admin-users"
+                    class="group bg-white rounded-2xl border border-slate-200 shadow-sm p-5 hover:border-slate-900 hover:shadow-md transition-all duration-200 flex flex-col justify-between h-44"
+                >
+                    <div class="space-y-2">
+                        <div
+                            class="w-9 h-9 rounded-xl bg-slate-100 text-slate-700 group-hover:bg-slate-900 group-hover:text-white flex items-center justify-center transition-all"
+                        >
+                            <mat-icon class="text-sm"
+                                >admin_panel_settings</mat-icon
+                            >
+                        </div>
+                        <h3
+                            class="text-sm font-bold text-slate-900 group-hover:text-black"
+                        >
+                            Control de Accesos
+                        </h3>
+                        <p class="text-xs text-slate-400 leading-snug">
+                            Administración del personal del sistema, asignación
+                            de roles de consulta y credenciales.
+                        </p>
+                    </div>
+                    <span
+                        class="text-[11px] font-bold text-slate-400 group-hover:text-slate-900 flex items-center gap-1 mt-2 transition-colors"
+                    >
+                        Configurar permisos
+                        <mat-icon
+                            class="text-xs! w-3.5! h-3.5! transition-transform group-hover:translate-x-1"
+                            >arrow_forward</mat-icon
+                        >
+                    </span>
+                </a>
+            </div>
+        </section>
+    </div>
 </div>

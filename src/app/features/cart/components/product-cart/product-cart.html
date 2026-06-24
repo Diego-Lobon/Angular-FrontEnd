@@ -1,56 +1,98 @@
 <div
-    class="border border-gray-300 rounded-2xl p-6 grid grid-rows-[1.5fr_0.5fr]"
+    class="bg-white border border-slate-200/80 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4 transition-all duration-150 hover:border-slate-300 shadow-xs relative w-full overflow-hidden"
 >
-    <img
-        class="w-min m-auto"
-        [src]="product?.imageUrl || 'assets/products/product-void.jpeg'"
-        (error)="onImageError($event)"
-    />
-    <div class="flex flex-col gap-1.5">
-        <span class="text-2xl text-gray-600">{{ product.name }}</span>
-
-        <div class="flex gap-1 text-[1rem]">
-            <span>{{ product.marca?.nombre || 'Genérico' }}</span>
-            <span>-</span>
-            <span>{{ product?.categoria?.nombre || 'Sin categoría' }}</span>
-        </div>
-        @if(authClienteService.isLoggedIn()){
+    <div class="flex items-center gap-3.5 w-full sm:w-auto flex-1 min-w-0">
         <div
-            class="flex justify-between items-center my-2 text-xl border-b pb-2 border-gray-100"
+            class="w-16 h-16 sm:w-20 sm:h-20 bg-slate-50 border border-slate-100 rounded-xl flex items-center justify-center p-2 shrink-0 overflow-hidden"
         >
-            <span class="font-bold text-gray-500">Precio:</span>
-            <span class="font-bold text-gray-800">
+            <img
+                class="max-w-full max-h-full object-contain mix-blend-multiply"
+                [src]="product?.imageUrl || 'assets/products/product-void.jpeg'"
+                (error)="onImageError($event)"
+                alt="{{ product.name }}"
+                loading="lazy"
+            />
+        </div>
+
+        <div class="min-w-0 flex-1 space-y-1.5">
+            <span
+                class="inline-block font-mono text-[9px] bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded font-bold tracking-wider"
+            >
+                {{ product.referencia_interna || 'SKU-GEN' }}
+            </span>
+
+            <h3
+                class="text-sm font-bold text-slate-800 tracking-tight leading-snug truncate w-full block"
+                title="{{ product.name }}"
+            >
+                {{ product.name }}
+            </h3>
+
+            <p
+                class="text-[11px] font-medium text-slate-400 truncate w-full block"
+            >
+                <span>{{ product.marca?.nombre || 'Genérico' }}</span>
+                <span class="mx-1 text-slate-200">•</span>
+                <span>{{ product?.categoria?.nombre || 'Sin categoría' }}</span>
+            </p>
+        </div>
+    </div>
+
+    <div
+        class="flex items-center justify-between sm:justify-end gap-4 w-full sm:w-auto pt-3 sm:pt-0 border-t border-slate-100 sm:border-0 shrink-0"
+    >
+        @if(authClienteService.isLoggedIn()){
+        <div class="text-left sm:text-right sm:pr-2 shrink-0">
+            <span
+                class="block text-[10px] uppercase font-bold text-slate-400 tracking-wider"
+                >Subtotal</span
+            >
+            <span
+                class="text-sm font-extrabold text-slate-900 font-mono whitespace-nowrap"
+            >
                 {{ displaySymbol() }} {{ displayPrice() | number:'1.2-2' }}
             </span>
         </div>
         }
-        <div class="flex justify-between mt-2">
-            <div class="flex gap-1 items-center">
-                <span class="text-[1rem]">Cantidad: </span>
-                <div class="flex gap-2 h-12">
-                    <button
-                        (click)="decreaseCant()"
-                        class="bg-black cursor-pointer hover:bg-gray-500 active:bg-gray-500 text-white text-3xl rounded-[0.4rem] w-10"
-                    >
-                        -
-                    </button>
-                    <span class="m-auto text-[1.2rem]">{{ cant() }}</span>
-                    <button
-                        (click)="increaseCant()"
-                        class="bg-black cursor-pointer hover:bg-gray-500 active:bg-gray-500 text-white text-3xl rounded-[0.4rem] w-10"
-                    >
-                        +
-                    </button>
-                </div>
-            </div>
+
+        <div
+            class="flex items-center bg-slate-50 rounded-xl border border-slate-200/70 p-1 h-9 shrink-0"
+        >
             <button
-                (click)="removeProduct()"
-                class="flex cursor-pointer justify-center items-center bg-red-500 hover:bg-red-300 active:bg-red-300 rounded-[0.4rem] px-1.5"
+                (click)="decreaseCant()"
+                type="button"
+                class="w-7 h-full flex items-center justify-center bg-white hover:bg-slate-100 text-slate-600 rounded-lg text-sm font-bold shadow-xs active:scale-95 transition-all cursor-pointer"
             >
-                <mat-icon class="text-white! text-3xl! w-auto! h-auto!"
-                    >restore_from_trash</mat-icon
-                >
+                —
+            </button>
+
+            <input
+                type="text"
+                inputmode="numeric"
+                pattern="[0-9]*"
+                [value]="cant()"
+                (keypress)="onlyNumbers($event)"
+                (blur)="onQuantityChange($event)"
+                (keydown.enter)="onQuantityChange($event); $event.target.blur()"
+                class="w-10 text-center text-xs font-extrabold text-slate-800 font-mono bg-transparent border-0 focus:outline-hidden focus:ring-0 p-0"
+            />
+
+            <button
+                (click)="increaseCant()"
+                type="button"
+                class="w-7 h-full flex items-center justify-center bg-white hover:bg-slate-100 text-slate-600 rounded-lg text-sm font-bold shadow-xs active:scale-95 transition-all cursor-pointer"
+            >
+                +
             </button>
         </div>
+
+        <button
+            (click)="removeProduct()"
+            type="button"
+            class="w-9 h-9 flex items-center justify-center bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-xl transition-colors cursor-pointer shrink-0"
+            aria-label="Eliminar producto"
+        >
+            <mat-icon class="text-xl! w-auto! h-auto!">delete_outline</mat-icon>
+        </button>
     </div>
 </div>

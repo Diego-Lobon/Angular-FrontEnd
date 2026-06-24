@@ -77,6 +77,18 @@ export class AuthClienteService {
         }
     }
 
+    getClienteId(): number | null {
+        const token = this.getToken();
+        if (!token) return null;
+
+        try {
+            const payload = jwtDecode<any>(token);
+            return payload.id ? Number(payload.id) : null; // 💡 Lee payload.id del backend
+        } catch {
+            return null;
+        }
+    }
+
     isLoggedIn(): boolean {
         return !!this.getToken();
     }
@@ -105,7 +117,7 @@ export class AuthClienteService {
 
         try {
             const payload = jwtDecode<any>(token);
-            console.log(payload)
+            console.log(payload);
             return payload.username || null;
         } catch {
             return null;

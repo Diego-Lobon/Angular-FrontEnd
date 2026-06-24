@@ -98,4 +98,31 @@ export class ProductCart {
         const element = event.target as HTMLImageElement;
         element.src = 'assets/products/product-void.jpeg';
     }
+
+    onlyNumbers(event: KeyboardEvent) {
+        const keysRegex = /^[0-9]$/;
+        if (!keysRegex.test(event.key)) {
+            event.preventDefault();
+        }
+    }
+
+    onQuantityChange(event: Event) {
+        const input = event.target as HTMLInputElement;
+        let value = parseInt(input.value, 10);
+
+        // Si está vacío, no es un número o es menor o igual a 0, por defecto regresamos a 1
+        if (isNaN(value) || value <= 0) {
+            value = 1;
+        }
+
+        // Actualizamos el Signal y la propiedad del producto
+        this.cant.set(value);
+        this.product.cantidad = value;
+
+        // Forzamos al input visual a mostrar el valor corregido (por si el usuario ingresó algo inválido)
+        input.value = String(value);
+
+        // Sincronizamos con la persistencia en Redis
+        this.cartRedisService.updateItemQuantity(this.product.productId, value);
+    }
 }

@@ -28,15 +28,13 @@ export class AdminProductCard implements OnChanges {
     editMode = false;
     editableProduct!: Product;
 
-    // Variables temporales para los inputs de texto en la edición
     selectedCategoryName = '';
     selectedMarcaName = '';
 
-    // Detecta cuando el padre modifica el producto (por ejemplo, al recalcular el Tipo de Cambio)
     ngOnChanges(changes: SimpleChanges) {
         if (changes['product']) {
-            this.editMode = false; // Cancela la edición activa para evitar inconsistencias
-            this.resetEditableProduct(); // Recarga los nuevos valores calculados
+            this.editMode = false;
+            this.resetEditableProduct();
         }
     }
 
@@ -45,12 +43,9 @@ export class AdminProductCard implements OnChanges {
             this.editableProduct = {
                 ...this.product,
                 nombre: this.product.nombre || '',
-                costo_dolares: this.product.costo_dolares,
-                costo_soles: this.product.costo_soles,
                 precio_venta_dolares: this.product.precio_venta_dolares,
                 precio_venta_soles: this.product.precio_venta_soles,
             };
-            // Cargamos los nombres actuales en los inputs del formulario de edición
             this.selectedCategoryName = this.product.categoria?.nombre || '';
             this.selectedMarcaName = this.product.marca?.nombre || '';
         }
@@ -58,7 +53,6 @@ export class AdminProductCard implements OnChanges {
 
     toggleEdit() {
         if (this.editMode) {
-            // Al hacer click en "Actualizar", buscamos los objetos correspondientes en las listas
             const foundCategory = this.categoriesList.find(
                 (c) =>
                     c.nombre.toLowerCase() ===
@@ -77,7 +71,6 @@ export class AdminProductCard implements OnChanges {
                 return;
             }
 
-            // Asignamos las relaciones completas para actualizar la vista local de inmediato
             this.product = {
                 ...this.editableProduct,
                 categoria: foundCategory,

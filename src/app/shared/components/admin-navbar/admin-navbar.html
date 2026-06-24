@@ -16,7 +16,7 @@
 
     <div class="flex items-center gap-4">
         <span class="text-white bg-gray-700 rounded-2xl py-2 px-4 text-[0.8rem]">
-            Administracion
+            {{ usuarioLogueado?.username || 'Panel' }}
         </span>
         <div class="flex items-center gap-2">
             <mat-icon
@@ -25,10 +25,6 @@
                 account_circle
             </mat-icon>
 
-            <div class="hidden sm:block text-xs text-right">
-                <p class="text-white font-medium leading-none">Daniel</p>
-                <small class="text-gray-400 text-[10px]">Admin</small>
-            </div>
         </div>
     </div>
 </nav>
@@ -58,42 +54,49 @@
             (click)="closeMenu()"
             class="hover:text-white flex items-center gap-2 py-2 transition-colors"
         >
-            <mat-icon class="text-lg!">home</mat-icon> Inicio
+            <mat-icon class="text-lg! w-auto! h-auto!">home</mat-icon> Inicio
         </a>
         <a
             routerLink="/admin-users"
             (click)="closeMenu()"
             class="hover:text-white flex items-center gap-2 py-2 transition-colors"
         >
-            <mat-icon class="text-lg!">supervisor_account</mat-icon> Usuarios
+            <mat-icon class="text-lg! w-auto! h-auto!">supervisor_account</mat-icon> Usuarios
         </a>
         <a
-            routerLink="/admin-customers"
+            routerLink="/home-clientes"
             (click)="closeMenu()"
             class="hover:text-white flex items-center gap-2 py-2 transition-colors"
         >
-            <mat-icon class="text-lg!">business</mat-icon> Clientes
+            <mat-icon class="text-lg! w-auto! h-auto!">business</mat-icon> Clientes
         </a>
         <a
             routerLink="/admin-products"
             (click)="closeMenu()"
             class="hover:text-white flex items-center gap-2 py-2 transition-colors"
         >
-            <mat-icon class="text-lg!">request_quote</mat-icon> Productos
+            <mat-icon class="text-lg! w-auto! h-auto!">request_quote</mat-icon> Productos
         </a>
         <a
             routerLink="/home-list-price"
             (click)="closeMenu()"
             class="hover:text-white flex items-center gap-2 py-2 transition-colors"
         >
-            <mat-icon class="text-lg!">monetization_on</mat-icon> Listas de precios
+            <mat-icon class="text-lg! w-auto! h-auto!">monetization_on</mat-icon> Listas de precios
+        </a>
+        <a
+            routerLink="/admin-cotizaciones"
+            (click)="closeMenu()"
+            class="hover:text-white flex items-center gap-2 py-2 transition-colors"
+        >
+            <mat-icon class="text-lg! w-auto! h-auto!">picture_as_pdf</mat-icon> Listas de cotizaciones
         </a>
         <a
             routerLink="/valid-cotizacion"
             (click)="closeMenu()"
             class="hover:text-white flex items-center gap-2 py-2 transition-colors"
         >
-            <mat-icon class="text-lg!">playlist_add_check</mat-icon> Validar Cotización
+            <mat-icon class="text-lg! w-auto! h-auto!">playlist_add_check</mat-icon> Validar Cotización
         </a>
         <button
             (click)="closeMenu(); logout()"

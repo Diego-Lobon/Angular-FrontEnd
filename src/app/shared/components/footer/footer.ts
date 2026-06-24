@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
-import { RouterLink } from "@angular/router";
+import { Component, inject } from '@angular/core';
+import { Router, RouterLink } from '@angular/router';
+import { AuthClienteService } from '../../../core/services/auth-cliente.service';
 
 @Component({
     selector: 'app-footer',
@@ -7,4 +8,16 @@ import { RouterLink } from "@angular/router";
     templateUrl: './footer.html',
     styleUrl: './footer.css',
 })
-export class Footer {}
+export class Footer {
+    public authClienteService = inject(AuthClienteService);
+    private router = inject(Router);
+
+    isLoggedIn() {
+        return !!localStorage.getItem('token');
+    }
+
+    logout() {
+        this.authClienteService.logout();
+        this.router.navigate(['/']);
+    }
+}

@@ -15,7 +15,8 @@ export class PdfValidationService {
         const formData = new FormData();
 
         formData.append('pdf', file);
-        
+
         return this.http.post(`${this.apiUrl}/validate-pdf`, formData);
     }
+
 }

@@ -1,138 +1,201 @@
-<div class="mt-16 px-4 py-6 bg-gray-50 min-h-screen">
-    <div class="max-w-md mx-auto">
-        <div class="flex justify-between items-center mb-6">
-            <h2 class="text-xl font-bold text-gray-800">Lista de Productos</h2>
+<div class="mt-16 px-4 py-8 bg-gray-50 min-h-screen">
+    <div class="max-w-7xl mx-auto space-y-6">
+        <div
+            class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-6 rounded-2xl border border-gray-200/80 shadow-sm"
+        >
+            <div>
+                <h2 class="text-2xl font-black text-gray-900 tracking-tight">
+                    Catálogo de Productos
+                </h2>
+                <p class="text-xs text-gray-500 mt-1">
+                    Gestiona los precios, marcas, categorías y la sincronización
+                    con Odoo ERP.
+                </p>
+            </div>
             <span
-                class="bg-black text-white text-xs font-semibold px-2.5 py-1 rounded-full"
+                class="bg-gray-900 text-white text-xs font-bold px-3 py-1.5 rounded-full tracking-wide shadow-sm shrink-0"
             >
-                {{ filteredProducts().length }} Productos
+                {{ filteredProducts().length }} Productos en total
             </span>
         </div>
-    </div>
 
-    <div class="flex flex-col gap-3">
-        <input
-            type="text"
-            placeholder="Buscar producto..."
-            class="border p-4 rounded-4xl w-full text-[1rem] bg-white border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-900"
-            (input)="searchTerm.set($any($event.target).value); currentPage.set(1)"
-        />
-        <div class="flex flex-col sm:flex-row gap-2">
-            <select
-                class="border p-2 rounded w-full text-[0.9rem] border-gray-400 bg-white"
-                (change)="selectedCategory.set($any($event.target).value); currentPage.set(1)"
-            >
-                <option value="">Todas las categorías</option>
-                @for(category of categories(); track category.id){
-                <option [value]="category.id">{{ category.nombre }}</option>
-                }
-            </select>
-
-            <select
-                class="border p-2 rounded w-full text-[0.9rem] border-gray-400 bg-white"
-                (change)="selectedMarca.set($any($event.target).value); currentPage.set(1)"
-            >
-                <option value="">Todas las marcas</option>
-                @for(marca of marcas(); track marca.id){
-                <option [value]="marca.id">{{ marca.nombre }}</option>
-                }
-            </select>
-
-            <div
-                class="flex items-center gap-2 border border-gray-400 bg-white p-2 rounded-lg w-full sm:max-w-[180px]"
-            >
-                <span
-                    class="text-xs font-bold text-gray-500 uppercase tracking-wider pl-1"
-                    >Tipo de cambio</span
+        <div
+            class="bg-white p-5 rounded-2xl border border-gray-200/80 shadow-sm space-y-4"
+        >
+            <div class="relative w-full">
+                <mat-icon
+                    class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-xl w-auto h-auto"
+                    >search</mat-icon
                 >
                 <input
-                    type="number"
-                    step="0.01"
-                    #tcInput
-                    [value]="tipoCambio()"
-                    class="w-full text-right text-[0.9rem] font-bold text-blue-700 focus:outline-none"
-                    placeholder="0.00"
-                    (keyup.enter)="updateTipoCambio(tcInput.value)"
+                    type="text"
+                    placeholder="Buscar producto por nombre, código o SKU..."
+                    class="pl-12 pr-4 py-3.5 rounded-xl w-full text-sm bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-black focus:bg-white transition-all placeholder-gray-400"
+                    (input)="searchTerm.set($any($event.target).value); currentPage.set(1)"
                 />
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                <div class="flex flex-col gap-1.5">
+                    <label
+                        class="text-[11px] font-bold text-gray-500 uppercase tracking-wider pl-1"
+                        >Categoría</label
+                    >
+                    <select
+                        class="border border-gray-200 p-3 rounded-xl text-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-black focus:bg-white transition-all text-gray-700"
+                        (change)="selectedCategory.set($any($event.target).value); currentPage.set(1)"
+                    >
+                        <option value="">Todas las categorías</option>
+                        @for(category of categories(); track category.id){
+                        <option [value]="category.id">
+                            {{ category.nombre }}
+                        </option>
+                        }
+                    </select>
+                </div>
+
+                <div class="flex flex-col gap-1.5">
+                    <label
+                        class="text-[11px] font-bold text-gray-500 uppercase tracking-wider pl-1"
+                        >Marca</label
+                    >
+                    <select
+                        class="border border-gray-200 p-3 rounded-xl text-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-black focus:bg-white transition-all text-gray-700"
+                        (change)="selectedMarca.set($any($event.target).value); currentPage.set(1)"
+                    >
+                        <option value="">Todas las marcas</option>
+                        @for(marca of marcas(); track marca.id){
+                        <option [value]="marca.id">{{ marca.nombre }}</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="flex flex-col gap-1.5 sm:col-span-2 lg:col-span-2">
+                    <label
+                        class="text-[11px] font-bold text-gray-500 uppercase tracking-wider pl-1"
+                        >Tipo de cambio</label
+                    >
+                    <div
+                        class="flex items-center gap-2 bg-gray-50 border border-gray-200 p-1.5 rounded-xl focus-within:ring-2 focus-within:ring-black focus-within:bg-white transition-all"
+                    >
+                        <input
+                            type="number"
+                            step="0.001"
+                            #tcInput
+                            [value]="tipoCambio()"
+                            class="w-full bg-transparent text-right pr-2 text-sm font-black text-blue-700 focus:outline-none placeholder-gray-400"
+                            placeholder="0.00"
+                            (keyup.enter)="updateTipoCambio(tcInput.value)"
+                        />
+
+                        <button
+                            type="button"
+                            (click)="consultarSunat()"
+                            [disabled]="loadingSunat()"
+                            class="bg-blue-50 hover:bg-blue-100 text-blue-700 font-bold text-xs px-3 py-2.5 rounded-lg active:scale-[0.98] disabled:opacity-50 transition-all flex items-center justify-center gap-1 shrink-0"
+                        >
+                            <mat-icon
+                                class="text-sm! w-auto! h-auto! flex items-center justify-center {{ loadingSunat() ? 'animate-spin' : '' }}"
+                            >
+                                {{ loadingSunat() ? 'autorenew' : 'language' }}
+                            </mat-icon>
+                            {{ loadingSunat() ? 'Buscando...' : 'SUNAT Hoy' }}
+                        </button>
+
+                        <button
+                            type="button"
+                            (click)="updateTipoCambio(tcInput.value)"
+                            class="bg-gray-900 hover:bg-gray-800 text-white font-medium text-xs px-4 py-2.5 rounded-lg active:scale-[0.98] transition-all flex items-center justify-center gap-1.5 shrink-0 shadow-sm"
+                        >
+                            <mat-icon
+                                class="text-sm! w-auto! h-auto! flex items-center justify-center"
+                                >sync</mat-icon
+                            >
+                            Aplicar
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex justify-end pt-2 border-t border-gray-100">
                 <button
                     type="button"
-                    (click)="updateTipoCambio(tcInput.value)"
-                    class="bg-gray-900 hover:bg-gray-800 text-white font-medium text-xs px-4 py-2 rounded-lg active:scale-[0.98] transition-all flex items-center justify-center gap-1 shrink-0 h-[42px] sm:h-auto shadow-sm"
+                    (click)="syncFilteredPricesToOdoo()"
+                    class="w-full sm:w-auto bg-emerald-700 hover:bg-emerald-600 text-white font-bold text-xs px-5 py-3.5 rounded-xl active:scale-[0.97] transition-all flex items-center justify-center gap-2 shadow-sm uppercase tracking-wider"
                 >
                     <mat-icon
-                        class="text-sm! w-4! h-4! flex items-center justify-center"
-                        >sync</mat-icon
+                        class="text-base! w-4! h-4! flex items-center justify-center"
+                        >cloud_upload</mat-icon
                     >
-                    Aplicar
+                    Sincronizar Precios con Odoo ({{ filteredProducts().length
+                    }} Filtrados)
                 </button>
             </div>
         </div>
-        <div class="flex justify-end mt-2">
-            <button
-                type="button"
-                (click)="syncFilteredPricesToOdoo()"
-                class="w-full sm:w-auto bg-emerald-700 hover:bg-emerald-600 text-white font-semibold text-xs px-5 py-3 rounded-xl active:scale-[0.98] transition-all flex items-center justify-center gap-2 shadow-md"
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 py-2">
+            @for(product of paginatedProducts(); track product.id) {
+            <app-admin-product-card
+                [product]="product"
+                [tipoCambio]="tipoCambio()"
+                [categoriesList]="categories()"
+                [marcasList]="marcas()"
+                (onSave)="saveProductChanges($event)"
+                class="transition-transform hover:-translate-y-0.5 duration-200"
+            />
+            } @if(filteredProducts().length === 0){
+            <div
+                class="text-center text-gray-400 text-sm col-span-full py-16 bg-white rounded-2xl border border-gray-200/80 shadow-sm flex flex-col items-center justify-center gap-2"
             >
-                <mat-icon
-                    class="text-sm! w-4! h-4! flex items-center justify-center"
-                    >cloud_upload</mat-icon
+                <mat-icon class="text-4xl! h-auto! w-auto! text-gray-300"
+                    >inventory_2</mat-icon
                 >
-                Actualizar precios al Odoo ({{ filteredProducts().length }}
-                filtrados)
-            </button>
-        </div>
-    </div>
-
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 py-4">
-        @for(product of paginatedProducts(); track product.id) {
-        <app-admin-product-card
-            [product]="product"
-            [tipoCambio]="tipoCambio()"
-            [categoriesList]="categories()"
-            [marcasList]="marcas()"
-            (onSave)="saveProductChanges($event)"
-        />
-        } @if(filteredProducts().length === 0){
-        <div class="text-center text-gray-500 text-xl col-span-full py-10">
-            No se encontraron productos
-        </div>
-        }
-    </div>
-
-    @if(totalPages() > 1) {
-    <div
-        class="flex justify-center items-center gap-1 w-full max-w-lg mx-auto pb-12 px-4"
-    >
-        <button
-            (click)="goToPage(currentPage() - 1)"
-            [disabled]="currentPage() === 1"
-            class="flex items-center justify-center min-w-10 h-10 rounded-lg border border-gray-300 disabled:opacity-30 disabled:hover:bg-transparent hover:bg-gray-100 transition-colors bg-white z-10"
-        >
-            <mat-icon>chevron_left</mat-icon>
-        </button>
-
-        <div
-            class="flex items-center gap-1.5 overflow-x-auto px-2 py-1 scroll-smooth max-w-full mask-edges"
-        >
-            @for(page of pageNumbers(); track page) {
-            <button
-                (click)="goToPage(page)"
-                [class]="currentPage() === page 
-                        ? 'min-w-10 h-10 px-3 rounded-lg bg-black text-white font-medium shadow-sm shrink-0' 
-                        : 'min-w-10 h-10 px-3 rounded-lg border border-gray-300 hover:bg-gray-100 transition-colors text-gray-700 bg-white shrink-0'"
-            >
-                {{ page }}
-            </button>
+                <p class="font-medium">
+                    No se encontraron productos coincidentes
+                </p>
+                <span class="text-xs text-gray-400"
+                    >Prueba ajustando los filtros o el término de
+                    búsqueda.</span
+                >
+            </div>
             }
         </div>
 
-        <button
-            (click)="goToPage(currentPage() + 1)"
-            [disabled]="currentPage() === totalPages()"
-            class="flex items-center justify-center min-w-10 h-10 rounded-lg border border-gray-300 disabled:opacity-30 disabled:hover:bg-transparent hover:bg-gray-100 transition-colors bg-white z-10"
+        @if(totalPages() > 1) {
+        <div
+            class="flex justify-center items-center gap-2 w-full max-w-lg mx-auto pt-4 pb-12 px-4"
         >
-            <mat-icon>chevron_right</mat-icon>
-        </button>
+            <button
+                (click)="goToPage(currentPage() - 1)"
+                [disabled]="currentPage() === 1"
+                class="flex items-center justify-center min-w-10 h-10 rounded-xl border border-gray-200 disabled:opacity-25 disabled:hover:bg-transparent hover:bg-gray-100 active:scale-95 transition-all bg-white shadow-sm shrink-0"
+            >
+                <mat-icon>chevron_left</mat-icon>
+            </button>
+
+            <div
+                class="flex items-center gap-1.5 overflow-x-auto px-2 py-1 scroll-smooth max-w-full mask-edges no-scrollbar"
+            >
+                @for(page of pageNumbers(); track page) {
+                <button
+                    (click)="goToPage(page)"
+                    [class]="currentPage() === page 
+                        ? 'min-w-10 h-10 px-3 rounded-xl bg-black text-white font-bold text-xs shadow-sm shrink-0 transition-all' 
+                        : 'min-w-10 h-10 px-3 rounded-xl border border-gray-200 hover:bg-gray-50 active:scale-95 transition-all text-gray-600 font-medium text-xs bg-white shrink-0 shadow-sm'"
+                >
+                    {{ page }}
+                </button>
+                }
+            </div>
+
+            <button
+                (click)="goToPage(currentPage() + 1)"
+                [disabled]="currentPage() === totalPages()"
+                class="flex items-center justify-center min-w-10 h-10 rounded-xl border border-gray-200 disabled:opacity-25 disabled:hover:bg-transparent hover:bg-gray-100 active:scale-95 transition-all bg-white shadow-sm shrink-0"
+            >
+                <mat-icon>chevron_right</mat-icon>
+            </button>
+        </div>
+        }
     </div>
-    }
 </div>

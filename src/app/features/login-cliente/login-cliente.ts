@@ -3,11 +3,12 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthClienteService } from '../../core/services/auth-cliente.service';
 import { CartRedisService } from '../../core/services/cart-redis.service';
+import { MatIcon } from '@angular/material/icon';
 
 @Component({
     selector: 'app-login-cliente',
     standalone: true,
-    imports: [FormsModule],
+    imports: [FormsModule, MatIcon],
     templateUrl: './login-cliente.html',
     styleUrl: './login-cliente.css',
 })

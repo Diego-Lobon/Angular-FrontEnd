@@ -44,7 +44,60 @@ export class AdminProducts implements OnInit {
     // * --- SIGNALS PARA PAGINACIÓN ---
     currentPage = signal<number>(1);
     itemsPerPage = signal<number>(10);
+
+    // Valor fallback por si la base de datos tarda en responder
     readonly tipoCambio = signal<number>(3.75);
+
+    loadingSunat = signal<boolean>(false);
+
+    // =========================================================
+    // NUEVO MÉTODO: Carga inicial del tipo de cambio desde la BD
+    // =========================================================
+    cargarTipoCambioDesdeBD() {
+        this.productsService.getTipoCambioBD().subscribe({
+            next: (res) => {
+                if (res && res.dolar) {
+                    this.tipoCambio.set(Number(res.dolar));
+                    console.log(
+                        'Tipo de cambio recuperado con éxito desde la BD:',
+                        res.dolar,
+                    );
+                }
+            },
+            error: (err) => {
+                console.error(
+                    'No se pudo obtener el Tipo de Cambio persistido de la BD:',
+                    err,
+                );
+            },
+        });
+    }
+
+    consultarSunat() {
+        this.loadingSunat.set(true);
+        this.productsService.getTipoCambioSunat().subscribe({
+            next: (res) => {
+                if (res && res.venta > 0) {
+                    this.tipoCambio.set(res.venta);
+                    console.log(
+                        'Tipo de cambio actualizado con éxito desde SUNAT:',
+                        res.venta,
+                    );
+                }
+                this.loadingSunat.set(false);
+            },
+            error: (err) => {
+                console.error(
+                    'Error al extraer TC de la SUNAT a través de NestJS:',
+                    err,
+                );
+                alert(
+                    'No se pudo extraer el tipo de cambio automáticamente. Inténtalo de nuevo.',
+                );
+                this.loadingSunat.set(false);
+            },
+        });
+    }
 
     // Filtro original
     filteredProducts = computed(() => {
@@ -98,6 +151,8 @@ export class AdminProducts implements OnInit {
 
     ngOnInit() {
         if (isPlatformBrowser(this.platformId)) {
+            this.cargarTipoCambioDesdeBD();
+
             this.productsService.getProducts().subscribe((products) => {
                 this.products.set(products);
             });
@@ -137,34 +192,37 @@ export class AdminProducts implements OnInit {
             return;
         }
 
+        this.productsService.saveTipoCambioHistorico(num).subscribe({
+            next: (savedLog) => {
+                console.log(
+                    '¡Tipo de cambio actualizado/respaldado en la BD con ID:',
+                    savedLog.id, // Mostrará 1
+                    'y Valor:',
+                    savedLog.dolar, // Mostrará el nuevo tipo de cambio (ej. 3.386)
+                );
+            },
+            error: (err) => {
+                console.error(
+                    'No se pudo guardar el histórico del TC en la BD:',
+                    err,
+                );
+            },
+        });
+
         this.tipoCambio.set(num);
         console.log('Nuevo tipo de cambio aplicado globalmente:', num);
 
-        // 1. Preparar las actualizaciones concurrentes para la Base de Datos
         const uploadObservables = this.products()
             .map((product) => {
-                // CORREGIDO: Se añadió el espacio para que declare la variable correctamente
                 let hasChanges = false;
 
-                const costoDolares = product.costo_dolares
-                    ? Number(product.costo_dolares)
-                    : 0;
                 const precioVentaDolares = product.precio_venta_dolares
                     ? Number(product.precio_venta_dolares)
                     : 0;
 
-                let nuevoCostoSoles = product.costo_soles
-                    ? Number(product.costo_soles)
-                    : 0;
                 let nuevoPrecioVentaSoles = product.precio_venta_soles
                     ? Number(product.precio_venta_soles)
                     : 0;
-
-                if (costoDolares > 0) {
-                    nuevoCostoSoles =
-                        Math.round(costoDolares * num * 100) / 100;
-                    hasChanges = true;
-                }
 
                 if (precioVentaDolares > 0) {
                     nuevoPrecioVentaSoles =
@@ -174,10 +232,9 @@ export class AdminProducts implements OnInit {
 
                 if (!hasChanges) return null;
 
+                // ❌ Se eliminaron 'costo_dolares' y 'costo_soles' de este objeto
                 const payload = {
                     nombre: product.nombre,
-                    costo_dolares: costoDolares,
-                    costo_soles: nuevoCostoSoles,
                     precio_venta_dolares: precioVentaDolares,
                     precio_venta_soles: nuevoPrecioVentaSoles,
                     categoriaId: product.categoria?.id
@@ -205,7 +262,6 @@ export class AdminProducts implements OnInit {
             return;
         }
 
-        // 2. Ejecutar las actualizaciones en la base de datos y actualizar el Signal local
         let completados = 0;
         uploadObservables.forEach((item) => {
             if (item) {
@@ -222,14 +278,14 @@ export class AdminProducts implements OnInit {
                         );
 
                         if (completados === uploadObservables.length) {
-                            console.log(
-                                '¡Todos los productos han sido actualizados en la base de datos con el nuevo TC!',
+                            alert(
+                                '¡Todos los productos actualizados y Tipo de Cambio registrado en BD!',
                             );
                         }
                     },
                     error: (err) => {
                         console.error(
-                            `Error al actualizar el producto ID ${item.id} con el nuevo TC:`,
+                            `Error al actualizar el producto ID ${item.id}:`,
                             err,
                         );
                     },
@@ -241,10 +297,9 @@ export class AdminProducts implements OnInit {
     saveProductChanges(updatedProduct: Product) {
         console.log('Enviando cambios al Backend de NestJS:', updatedProduct);
 
+        // ❌ Se eliminaron 'costo_dolares' y 'costo_soles' de este objeto también
         const payload = {
             nombre: updatedProduct.nombre,
-            costo_dolares: Number(updatedProduct.costo_dolares),
-            costo_soles: Number(updatedProduct.costo_soles),
             precio_venta_dolares: Number(updatedProduct.precio_venta_dolares),
             precio_venta_soles: Number(updatedProduct.precio_venta_soles),
             categoriaId: updatedProduct.categoria?.id
@@ -281,8 +336,6 @@ export class AdminProducts implements OnInit {
                 },
             });
     }
-
-    // ... (Tus otros métodos permanecen intactos)
 
     syncFilteredPricesToOdoo() {
         const filteredlist = this.filteredProducts();

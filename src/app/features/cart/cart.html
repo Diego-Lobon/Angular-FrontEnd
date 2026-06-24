@@ -1,68 +1,318 @@
-<div
-    class="mt-20 max-w-2xl mx-auto px-4 py-10 relative flex flex-col min-h-screen"
->
-    <app-navpage />
-    <div class="flex flex-col gap-1 mb-6">
-        <h2 class="text-2xl text-gray-700 font-bold">Carrito de compras</h2>
-        <span class="text-[1rem]">
-            Revisa los productos que has seleccionado y solicita una cotización
-            personalizada.
-        </span>
-    </div>
+<div class="bg-slate-50 min-h-screen antialiased text-slate-800 pb-12">
+    <div class="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8">
+        <app-navpage />
 
-    <div class="grid grid-cols-1 gap-6 mb-6">
-        @for(item of (cartRedisService.cartItems$ | async); track
-        item.productId) {
-
-        <app-product-cart
-            [product]="{
-                productId:item.productId,
-                referencia_interna:item.referencia_interna,
-                name:item.name,
-                price_dolares:item.price_dolares,
-                price_soles:item.price_soles,
-                moneda:item.moneda,
-                cantidad:item.cantidad,
-                imageUrl:item.imageUrl,
-                marca:item.marca,
-                categoria:item.categoria
-            }"
-        />
-
-        } @if((cartRedisService.cartItems$ | async)?.length === 0){
-        <div class="text-center text-2xl text-gray-500 py-10">
-            No hay productos en el carrito
-        </div>
-        }
-    </div>
-
-    @if(((cartRedisService.cartItems$ | async) ?? []).length > 0) {
-    <div
-        class="sticky bottom-4 z-30 mt-auto flex flex-col gap-2 border border-gray-300 rounded-2xl p-6 bg-white/95 backdrop-blur-md shadow-[0_-8px_30px_rgb(0,0,0,0.12)]"
-    >
-        <div class="flex justify-between items-center mb-2 px-1">
-            <span class="text-gray-600 font-medium"
-                >Cantidad de productos:</span
+        <div class="flex flex-col gap-1 mt-4 mb-6">
+            <h1
+                class="text-2xl font-extrabold tracking-tight text-slate-900 sm:text-3xl"
             >
-            <span class="text-xl font-bold text-gray-900">
-                {{ cartRedisService.getCartCount() | async}}
-            </span>
+                Tu Carrito
+            </h1>
+            <p class="text-xs sm:text-sm text-slate-500">
+                Revisa los productos seleccionados y completa tus datos de
+                contacto para procesar tu cotización formal.
+            </p>
         </div>
 
-        <button
-            (click)="generateQuotation()"
-            class="flex justify-center items-center cursor-pointer gap-1 w-full text-white bg-red-500 hover:bg-red-600 active:bg-red-700 rounded-lg p-2.5 transition-colors"
-        >
-            <mat-icon class="text-2xl">insert_drive_file</mat-icon>
-            <span class="text-lg font-medium">Visualizar cotización</span>
-        </button>
-        <button
-            (click)="downloadQuotation()"
-            class="flex justify-center items-center cursor-pointer gap-1 w-full text-white bg-blue-500 hover:bg-blue-600 active:bg-blue-700 rounded-lg p-2.5 transition-colors"
-        >
-            <mat-icon class="text-2xl">download</mat-icon>
-            <span class="text-lg font-medium">Descargar cotización</span>
-        </button>
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            <div class="lg:col-span-7 flex flex-col gap-3.5">
+                @for(item of (cartRedisService.cartItems$ | async); track
+                item.productId) {
+                <app-product-cart
+                    [product]="{
+                        productId: item.productId,
+                        referencia_interna: item.referencia_interna,
+                        name: item.name,
+                        price_dolares: item.price_dolares,
+                        price_soles: item.price_soles,
+                        moneda: item.moneda,
+                        cantidad: item.cantidad,
+                        imageUrl: item.imageUrl,
+                        marca: item.marca,
+                        categoria: item.categoria
+                    }"
+                />
+                } @empty {
+                <div
+                    class="text-center py-16 bg-white border border-dashed border-slate-200 rounded-2xl space-y-3 shadow-xs"
+                >
+                    <div
+                        class="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center mx-auto text-slate-400"
+                    >
+                        <mat-icon class="text-2xl!">shopping_cart</mat-icon>
+                    </div>
+                    <div class="space-y-1">
+                        <p class="text-base font-bold text-slate-700">
+                            El carrito está vacío
+                        </p>
+                        <p class="text-xs text-slate-400 max-w-xs mx-auto">
+                            Explora nuestro catálogo para añadir componentes o
+                            herramientas a tu lista de cotizaciones.
+                        </p>
+                    </div>
+                </div>
+                } @if (currentProducts.length > 0) {
+                <div
+                    class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm mt-2 flex flex-col gap-3"
+                >
+                    <div
+                        class="flex items-center gap-2 border-b border-slate-100 pb-2"
+                    >
+                        <mat-icon class="text-slate-600 text-sm!"
+                            >monetization_on</mat-icon
+                        >
+                        <h3
+                            class="text-xs font-bold text-slate-500 uppercase tracking-wide"
+                        >
+                            Resumen Estimado
+                        </h3>
+                    </div>
+
+                    <div class="flex flex-col gap-1.5">
+                        @if (totalSoles > 0) {
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-slate-600"
+                                >Total Estimado (PEN):</span
+                            >
+                            <span
+                                class="text-lg font-extrabold text-slate-900 font-mono"
+                            >
+                                {{ totalSoles | currency:'S/ ':'symbol':'1.2-2'
+                                }}
+                            </span>
+                        </div>
+                        }
+                    </div>
+                    <p class="text-[10px] text-slate-400 italic mt-1">
+                        * Los precios no incluyen IGV.
+                    </p>
+                </div>
+                }
+            </div>
+
+            @if(((cartRedisService.cartItems$ | async) ?? []).length > 0) {
+            <div class="lg:col-span-5 lg:sticky lg:top-6 z-20">
+                <form
+                    [formGroup]="quotationForm"
+                    class="bg-white border border-slate-200 rounded-2xl p-5 sm:p-6 shadow-md flex flex-col gap-5"
+                >
+                    <div
+                        class="flex items-center gap-2 border-b border-slate-100 pb-3"
+                    >
+                        <mat-icon class="text-slate-900 font-bold"
+                            >assignment_ind</mat-icon
+                        >
+                        <h2
+                            class="text-sm font-bold text-slate-900 tracking-tight uppercase"
+                        >
+                            Datos para la Proforma
+                        </h2>
+                    </div>
+
+                    @if (apiErrorMessage()) {
+                    <div
+                        class="bg-red-50 border border-red-200 rounded-xl p-3.5 flex items-start gap-2.5 text-red-800 text-xs font-medium animate-fade-in"
+                    >
+                        <mat-icon
+                            class="text-red-500 text-base! w-auto! h-auto!"
+                            >error_outline</mat-icon
+                        >
+                        <span>{{ apiErrorMessage() }}</span>
+                    </div>
+                    } @if (quotationForm.invalid && formSubmitted()) {
+                    <div
+                        class="bg-amber-50 border border-amber-200 rounded-xl p-3.5 flex items-start gap-2.5 text-amber-800 text-xs font-medium"
+                    >
+                        <mat-icon
+                            class="text-amber-500 text-base! w-auto! h-auto!"
+                            >warning_amber</mat-icon
+                        >
+                        <span
+                            >Por favor complete todos los campos obligatorios
+                            resaltados en rojo.</span
+                        >
+                    </div>
+                    }
+
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div class="flex flex-col gap-1.5 sm:col-span-1">
+                            <label
+                                class="text-[11px] font-bold text-slate-500 uppercase tracking-wide"
+                                >Documento</label
+                            >
+                            <select
+                                formControlName="tipoDocumento"
+                                class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-xs font-medium text-slate-800 focus:outline-hidden focus:ring-2 focus:ring-slate-900 focus:bg-white transition-all cursor-pointer"
+                            >
+                                <option value="RUC">RUC</option>
+                                <option value="DNI">DNI</option>
+                            </select>
+                        </div>
+
+                        <div
+                            class="flex flex-col gap-1.5 sm:col-span-2 relative"
+                        >
+                            <label
+                                class="text-[11px] font-bold text-slate-500 uppercase tracking-wide"
+                                >Número de Identidad</label
+                            >
+                            <div class="relative flex items-center">
+                                <input
+                                    type="text"
+                                    formControlName="numeroDocumento"
+                                    (blur)="onBuscarDocumento()"
+                                    placeholder="Ej. 20532435847"
+                                    [class.!border-red-500]="quotationForm.get('numeroDocumento')?.invalid && (quotationForm.get('numeroDocumento')?.touched || formSubmitted())"
+                                    class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs focus:outline-hidden focus:ring-2 focus:ring-slate-900 focus:bg-white transition-all font-mono pr-10"
+                                />
+                                @if (isLoadingApi()) {
+                                <div
+                                    class="absolute right-3 flex items-center text-slate-400 animate-spin"
+                                >
+                                    <mat-icon class="text-sm! w-auto! h-auto!"
+                                        >sync</mat-icon
+                                    >
+                                </div>
+                                }
+                            </div>
+                            @if (quotationForm.get('numeroDocumento')?.touched
+                            && quotationForm.get('numeroDocumento')?.invalid) {
+                            <span class="text-[10px] font-medium text-red-500">
+                                Largo requerido: {{
+                                quotationForm.get('tipoDocumento')?.value ===
+                                'RUC' ? '11 dígitos' : '8 dígitos' }}.
+                            </span>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col gap-1.5">
+                        <label
+                            class="text-[11px] font-bold text-slate-500 uppercase tracking-wide"
+                            >Razon Social / Nombre Completo</label
+                        >
+                        <input
+                            type="text"
+                            formControlName="razonSocial"
+                            placeholder="Ej. Corporación Isur S.R.L."
+                            [class.!border-red-500]="quotationForm.get('razonSocial')?.invalid && (quotationForm.get('razonSocial')?.touched || formSubmitted())"
+                            class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs focus:outline-hidden focus:ring-2 focus:ring-slate-900 focus:bg-white transition-all"
+                        />
+                    </div>
+
+                    <div class="flex flex-col gap-1.5">
+                        <label
+                            class="text-[11px] font-bold text-slate-500 uppercase tracking-wide"
+                            >Dirección Fiscal / Despacho</label
+                        >
+                        <input
+                            type="text"
+                            formControlName="direccion"
+                            placeholder="Ej. Jr. Zepita Nro. 533 Int. 401A - Ilo"
+                            [class.!border-red-500]="quotationForm.get('direccion')?.invalid && (quotationForm.get('direccion')?.touched || formSubmitted())"
+                            class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs focus:outline-hidden focus:ring-2 focus:ring-slate-900 focus:bg-white transition-all"
+                        />
+                    </div>
+
+                    <div class="flex flex-col gap-1.5">
+                        <label
+                            class="text-[11px] font-bold text-slate-500 uppercase tracking-wide"
+                            >Correo Electrónico</label
+                        >
+                        <input
+                            type="text"
+                            formControlName="email"
+                            placeholder="cliente@empresa.com"
+                            [class.!border-red-500]="quotationForm.get('email')?.invalid && (quotationForm.get('email')?.touched || formSubmitted())"
+                            class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs focus:outline-hidden focus:ring-2 focus:ring-slate-900 focus:bg-white transition-all"
+                        />
+                    </div>
+
+                    @if (quotationForm.get('tipoDocumento')?.value === 'RUC') {
+                    <div class="flex flex-col gap-1.5 animate-fade-in">
+                        <label
+                            class="text-[11px] font-bold text-slate-500 uppercase tracking-wide"
+                        >
+                            Solicitante / Persona de Contacto
+                        </label>
+                        <input
+                            type="text"
+                            formControlName="solicitante"
+                            placeholder="Ej. Ing. Juan Carlos"
+                            [class.!border-red-500]="quotationForm.get('solicitante')?.invalid && (quotationForm.get('solicitante')?.touched || formSubmitted())"
+                            class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs focus:outline-hidden focus:ring-2 focus:ring-slate-900 focus:bg-white transition-all"
+                        />
+                    </div>
+                    }
+
+                    <div
+                        class="flex justify-between items-center bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 mt-2"
+                    >
+                        <div
+                            class="flex items-center gap-1.5 text-slate-500 text-xs font-semibold"
+                        >
+                            <mat-icon
+                                class="text-slate-400 text-base! w-auto! h-auto!"
+                                >inventory_2</mat-icon
+                            >
+                            <span>Items en lista:</span>
+                        </div>
+                        <span
+                            class="text-sm font-extrabold text-slate-950 font-mono bg-white px-2.5 py-0.5 rounded-md border border-slate-200"
+                        >
+                            {{ cartRedisService.getCartCount() | async }}
+                        </span>
+                    </div>
+
+                    <div
+                        class="grid grid-cols-1 sm:grid-cols-3 gap-2 py-1.5 mt-1"
+                    >
+                        <button
+                            (click)="generateQuotation()"
+                            type="button"
+                            class="w-full flex justify-center items-center gap-1.5 text-slate-700 bg-slate-100 hover:bg-slate-200 disabled:opacity-50 font-bold text-xs py-3.5 rounded-xl transition-all active:scale-[0.98] cursor-pointer"
+                        >
+                            <mat-icon class="text-sm! w-auto! h-auto!"
+                                >insert_drive_file</mat-icon
+                            >
+                            <span>Previsualizar</span>
+                        </button>
+
+                        <button
+                            (click)="downloadQuotation()"
+                            [disabled]="!quotationProcessedData()"
+                            type="button"
+                            class="w-full flex justify-center items-center gap-1.5 font-bold text-xs py-3.5 rounded-xl transition-all active:scale-[0.98] cursor-pointer"
+                            [ngClass]="{
+        'bg-slate-100 text-slate-700 hover:bg-slate-200': quotationProcessedData(),
+        'bg-slate-200 text-slate-400 opacity-60 cursor-not-allowed': !quotationProcessedData()
+    }"
+                        >
+                            <mat-icon class="text-sm! w-auto! h-auto!"
+                                >download</mat-icon
+                            >
+                            <span>Descargar PDF</span>
+                        </button>
+
+                        <button
+                            (click)="sendQuotation()"
+                            [disabled]="isLoadingApi() || currentProducts.length === 0"
+                            type="button"
+                            class="w-full flex justify-center items-center gap-1.5 text-white bg-slate-950 hover:bg-black disabled:bg-slate-700 font-bold text-xs py-3.5 rounded-xl transition-all active:scale-[0.98] shadow-xs cursor-pointer sm:col-span-1"
+                        >
+                            <mat-icon class="text-sm! w-auto! h-auto!">
+                                {{ isLoadingApi() ? 'hourglass_empty' : 'send'
+                                }}
+                            </mat-icon>
+                            <span
+                                >{{ isLoadingApi() ? 'Enviando...' : 'Enviar
+                                Cotización' }}</span
+                            >
+                        </button>
+                    </div>
+                </form>
+            </div>
+            }
+        </div>
     </div>
-    }
 </div>

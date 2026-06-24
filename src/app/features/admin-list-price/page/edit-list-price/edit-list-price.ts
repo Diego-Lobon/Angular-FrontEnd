@@ -27,6 +27,8 @@ interface SelectedProductListItem {
     id: number; // Forzado a number estricto para encajar con PricelistProduct
     codigo: string;
     nombre: string;
+    categoria: string;
+    marca: string;
     precioEditable: number;
     descuentoEditable: number;
     precioSolesBD: number;
@@ -124,15 +126,24 @@ export class EditListPrice implements OnInit {
                                 productoReal?.nombre ??
                                 p.nombre ??
                                 'Producto no encontrado',
-                            precioEditable: p.precioEditable,
-                            descuentoEditable: p.descuentoEditable,
+                            categoria:
+                                productoReal?.categoria?.nombre ??
+                                p.categoria ??
+                                'Sin Categoría',
+                            marca:
+                                productoReal?.marca?.nombre ??
+                                p.marca ??
+                                'Sin Marca',
+                            precioEditable: Number(p.precioEditable),
+                            descuentoEditable: Number(p.descuentoEditable),
                             precioSolesBD:
                                 productoReal?.precio_venta_soles ??
-                                p.precioEditable,
+                                Number(p.precioEditable),
                             precioDolaresBD:
                                 productoReal?.precio_venta_dolares ??
-                                p.precioEditable,
-                            tipoRegla: p.tipoRegla || 'DESCUENTO',
+                                Number(p.precioEditable),
+                            tipoRegla:
+                                (p.tipoRegla as ReglaTipo) || 'DESCUENTO',
                         };
                     }),
                 );
@@ -180,20 +191,43 @@ export class EditListPrice implements OnInit {
         this.sugerenciasProductos.set([]);
     }
 
-    cambiarMonedaGlobal(moneda: string) {
-        this.selectedMoneda.set(moneda);
+    cambiarMonedaGlobal(nuevaMoneda: string) {
+        this.selectedMoneda.set(nuevaMoneda);
+
+        this.selectedProductsList.update((productos) =>
+            productos.map((prod) => {
+                const precioBase =
+                    nuevaMoneda === 'SOLES'
+                        ? prod.precioSolesBD
+                        : prod.precioDolaresBD;
+                return {
+                    ...prod,
+                    precioEditable: precioBase,
+                };
+            }),
+        );
     }
 
-    cambiarReglaFila(item: SelectedProductListItem, regla: ReglaTipo) {
-        this.selectedProductsList.update((lista) =>
-            lista.map((p) =>
-                p.id === item.id
-                    ? {
-                          ...p,
-                          tipoRegla: regla,
-                      }
-                    : p,
-            ),
+    cambiarReglaFila(item: SelectedProductListItem, nuevaRegla: ReglaTipo) {
+        this.selectedProductsList.update((actuales) =>
+            actuales.map((p) => {
+                if (p.id === item.id) {
+                    const precioBase =
+                        this.selectedMoneda() === 'SOLES'
+                            ? p.precioSolesBD
+                            : p.precioDolaresBD;
+                    return {
+                        ...p,
+                        tipoRegla: nuevaRegla,
+                        descuentoEditable:
+                            nuevaRegla === 'PRECIO_FIJO'
+                                ? 0
+                                : this.descuentoBase(),
+                        precioEditable: precioBase,
+                    };
+                }
+                return p;
+            }),
         );
     }
 
@@ -238,7 +272,7 @@ export class EditListPrice implements OnInit {
             filtrados = [prod];
         }
 
-        // Mergeamos con la lógica existente de actualización/inserción
+        // Mergeamos con la lógica de actualización/inserción
         this.selectedProductsList.update((actuales) => {
             const copia = [...actuales];
 
@@ -273,11 +307,14 @@ export class EditListPrice implements OnInit {
                         }
                     }
                 } else {
-                    // Insertar nuevo registro
+                    // Insertar nuevo registro mapeando correctamente marca y categoría de la BD
                     copia.push({
                         id: Number(producto.id),
                         codigo: producto.referencia_interna || 'SIN-CODIGO',
                         nombre: producto.nombre,
+                        categoria:
+                            producto.categoria?.nombre || 'Sin Categoría',
+                        marca: producto.marca?.nombre || 'Sin Marca',
                         precioEditable: precioBase,
                         descuentoEditable:
                             reglaGlobal === 'DESCUENTO' ? descuentoGlobal : 0,
@@ -305,7 +342,7 @@ export class EditListPrice implements OnInit {
     aplicarConfiguracion() {
         if (this.updatingLista()) return;
 
-        // 2. Activar el estado de carga
+        // Activar el estado de carga
         this.updatingLista.set(true);
         const payload: Pricelist = {
             nombre: this.nombreLista(),
@@ -314,6 +351,8 @@ export class EditListPrice implements OnInit {
                 id: Number(p.id),
                 codigo: p.codigo,
                 nombre: p.nombre,
+                marca: p.marca,
+                categoria: p.categoria,
                 precioEditable: p.precioEditable,
                 descuentoEditable: p.descuentoEditable,
                 tipoRegla: p.tipoRegla,
@@ -322,13 +361,11 @@ export class EditListPrice implements OnInit {
 
         this.pricelistService.actualizarLista(this.listaId, payload).subscribe({
             next: () => {
-                // 3. Desactivar carga en éxito
                 this.updatingLista.set(false);
                 alert('Lista actualizada correctamente');
             },
             error: (err: any) => {
                 console.error(err);
-                // 4. Desactivar carga en error para permitir reintentar
                 this.updatingLista.set(false);
                 alert('Ocurrió un error al actualizar la lista de precios.');
             },

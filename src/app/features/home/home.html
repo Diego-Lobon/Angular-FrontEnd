@@ -1,3 +1,117 @@
-<div class="mt-20">
-    <app-carousel />
+<div
+    class="bg-slate-50 min-h-screen text-slate-800 antialiased space-y-12 pb-16"
+>
+    <section class="w-full">
+        <app-carousel />
+    </section>
+
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div
+            class="bg-white border border-slate-200/60 rounded-2xl p-5 grid grid-cols-1 sm:grid-cols-3 gap-6 shadow-xs"
+        >
+            <div class="flex items-start gap-3.5">
+                <div
+                    class="p-2.5 bg-slate-100 rounded-xl text-slate-900 shrink-0"
+                >
+                    <mat-icon class="w-5 h-5 flex items-center justify-center"
+                        >local_shipping</mat-icon
+                    >
+                </div>
+                <div>
+                    <h3 class="text-sm font-bold text-slate-900">
+                        Logística a Operaciones
+                    </h3>
+                    <p class="text-xs text-slate-400 mt-0.5">
+                        Despachos coordinados directamente a campamentos e
+                        instalaciones.
+                    </p>
+                </div>
+            </div>
+            <div
+                class="flex items-start gap-3.5 border-t sm:border-t-0 sm:border-x border-slate-100 pt-4 sm:pt-0 sm:px-6"
+            >
+                <div
+                    class="p-2.5 bg-slate-100 rounded-xl text-slate-900 shrink-0"
+                >
+                    <mat-icon class="w-5 h-5 flex items-center justify-center"
+                        >description</mat-icon
+                    >
+                </div>
+                <div>
+                    <h3 class="text-sm font-bold text-slate-900">
+                        Cotización Inmediata
+                    </h3>
+                    <p class="text-xs text-slate-400 mt-0.5">
+                        Arma tu lista en línea y descarga tu proforma formal en
+                        PDF al instante.
+                    </p>
+                </div>
+            </div>
+            <div
+                class="flex items-start gap-3.5 border-t sm:border-t-0 pt-4 sm:pt-0 sm:pl-4"
+            >
+                <div
+                    class="p-2.5 bg-slate-100 rounded-xl text-slate-900 shrink-0"
+                >
+                    <mat-icon class="w-5 h-5 flex items-center justify-center"
+                        >verified_user</mat-icon
+                    >
+                </div>
+                <div>
+                    <h3 class="text-sm font-bold text-slate-900">
+                        Calidad Certificada
+                    </h3>
+                    <p class="text-xs text-slate-400 mt-0.5">
+                        Productos EPP bajo normativas técnicas y estándares de
+                        seguridad.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-4">
+        <div
+            class="flex items-end justify-between border-b border-slate-200/60 pb-3"
+        >
+            <div>
+                <h2
+                    class="text-xl font-extrabold tracking-tight text-slate-900 sm:text-2xl"
+                >
+                    Suministros Destacados
+                </h2>
+                <p class="text-xs text-slate-400 mt-0.5">
+                    Artículos de alta rotación.
+                </p>
+            </div>
+            <a
+                routerLink="/productos"
+                class="text-xs font-bold text-slate-900 hover:underline flex items-center gap-1 shrink-0"
+            >
+                <span>Ver catálogo</span>
+                <mat-icon
+                    class="text-xs! w-3.5! h-3.5! flex items-center justify-center"
+                    >arrow_forward</mat-icon
+                >
+            </a>
+        </div>
+
+        <div
+            class="flex gap-4 sm:gap-6 overflow-x-auto pb-4 pt-1 px-1 snap-x snap-mandatory scrollbar-none scroll-smooth"
+        >
+            @for(prod of destacados(); track prod.id) {
+            <div class="w-[260px] sm:w-[280px] shrink-0 snap-start snap-always">
+                <app-product-card [product]="prod" [showPrice]="false" />
+            </div>
+            } @empty {
+            <div
+                class="w-full text-center py-16 text-slate-400 text-sm bg-white rounded-2xl border border-dashed border-slate-200"
+            >
+                <span class="animate-pulse block"
+                    >Conectando con el inventario de almacén...</span
+                >
+            </div>
+            }
+        </div>
+    </section>
 </div>

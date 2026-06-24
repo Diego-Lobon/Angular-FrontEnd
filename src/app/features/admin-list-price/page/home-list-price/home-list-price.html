@@ -1,87 +1,230 @@
-<div class="mt-16 px-4 py-8">
-    <div class="flex justify-between items-center mb-6">
-        <h1 class="text-2xl font-semibold text-gray-800">Listas de precios</h1>
-        <button
-            routerLink="create"
-            class="bg-black text-white rounded-[0.4rem] py-2 px-4 font-bold hover:bg-gray-500 active:bg-gray-500"
+<div class="mt-16 px-4 py-8 bg-slate-50/50 min-h-screen antialiased">
+    <div class="max-w-5xl mx-auto space-y-6">
+        <div
+            class="flex flex-row justify-between items-center bg-white p-6 rounded-2xl border border-slate-200/60 shadow-xs"
         >
-            Crear
-        </button>
-    </div>
+            <div>
+                <h1 class="text-2xl font-black text-slate-900 tracking-tight">
+                    Listas de Precios
+                </h1>
+                <p class="hidden sm:block text-xs text-slate-400 mt-1">
+                    Administra los diferentes esquemas de precios para tus
+                    clientes.
+                </p>
+            </div>
 
-    <div class="bg-white rounded-2xl border border-gray-200 overflow-hidden">
-        <table class="w-full text-left border-collapse table-fixed">
-            <thead>
-                <tr
-                    class="border-b border-gray-200 text-gray-500 text-xs font-semibold uppercase bg-gray-50/70"
+            <button
+                routerLink="create"
+                class="bg-slate-900 hover:bg-black text-white rounded-xl py-3 px-5 text-xs font-bold transition-all active:scale-[0.97] flex items-center gap-2 shadow-xs uppercase tracking-wider cursor-pointer"
+            >
+                <mat-icon
+                    class="text-sm! w-auto! h-auto! flex items-center justify-center"
+                    >add_circle</mat-icon
                 >
-                    <th class="py-3 px-4 w-[20%]">ID</th>
-                    <th class="py-3 px-4 w-[50%]">Nombre</th>
-                    <th class="py-3 px-4 w-[30%] text-center">Opciones</th>
-                </tr>
-            </thead>
+                Crear Lista
+            </button>
+        </div>
 
-            <tbody class="divide-y divide-gray-100 text-sm text-gray-700">
-                <!-- LOADING -->
-                @if(loading()) {
-                <tr>
-                    <td colspan="3" class="py-16">
-                        <div class="flex flex-col items-center gap-4">
-                            <!-- Spinner -->
-                            <div
-                                class="w-12 h-12 rounded-full border-4 border-gray-200 border-t-black animate-spin"
-                            ></div>
+        <div
+            class="bg-white rounded-2xl border border-slate-200/60 shadow-xs overflow-hidden"
+        >
+            @if(loading()) {
+            <div class="flex flex-col items-center justify-center py-20 gap-3">
+                <svg
+                    class="animate-spin h-8 w-8 text-slate-900"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                >
+                    <circle
+                        class="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        stroke-width="4"
+                    ></circle>
+                    <path
+                        class="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
+                </svg>
+                <span class="text-sm font-medium text-slate-400"
+                    >Cargando listas de precios...</span
+                >
+            </div>
+            } @else {
 
-                            <span class="text-gray-500 font-medium">
-                                Loading...
-                            </span>
-                        </div>
-                    </td>
-                </tr>
-
-                } @else { @for (item of listas(); track item.id) {
-
-                <tr class="hover:bg-gray-50 transition-colors">
-                    <td class="py-4 px-4 font-mono text-xs text-gray-500">
-                        {{ item.id }}
-                    </td>
-
-                    <td class="py-4 px-4 font-medium text-gray-800">
-                        {{ item.name }}
-                    </td>
-
-                    <td class="py-4 px-4">
-                        <div class="flex justify-center gap-2">
-                            <button
-                                [routerLink]="['edit', item.id]"
-                                class="text-gray-400 hover:text-blue-600 p-2 rounded-lg hover:bg-blue-50"
-                            >
-                                <mat-icon>edit</mat-icon>
-                            </button>
-
-                            <button
-                                (click)="eliminar(item.id)"
-                                class="text-gray-400 hover:text-red-500 p-2 rounded-lg hover:bg-red-50"
-                            >
-                                <mat-icon>delete</mat-icon>
-                            </button>
-                        </div>
-                    </td>
-                </tr>
-
-                } @empty {
-
-                <tr>
-                    <td
-                        colspan="3"
-                        class="py-12 text-center text-gray-400 italic"
+            <div class="hidden md:block overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr
+                            class="border-b border-slate-200 text-slate-400 text-[11px] font-bold uppercase tracking-wider bg-slate-50/70"
+                        >
+                            <th class="py-3.5 px-6 w-[15%]">ID</th>
+                            <th class="py-3.5 px-6 w-[60%]">
+                                Nombre del Catálogo
+                            </th>
+                            <th class="py-3.5 px-6 w-[25%] text-center">
+                                Acciones
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody
+                        class="divide-y divide-slate-100 text-sm text-slate-700"
                     >
-                        No hay listas de precios registradas
-                    </td>
-                </tr>
+                        @for (item of listas(); track item.id) {
+                        <tr
+                            class="hover:bg-slate-50/50 transition-colors group"
+                        >
+                            <td
+                                class="py-4 px-6 font-mono text-xs text-slate-400"
+                            >
+                                #{{ item.id }}
+                            </td>
+                            <td class="py-4 px-6 font-semibold text-slate-800">
+                                {{ item.name }}
+                            </td>
+                            <td class="py-4 px-6">
+                                <div class="flex justify-center gap-1.5">
+                                    <button
+                                        [routerLink]="['edit', item.id]"
+                                        class="text-slate-400 hover:text-slate-900 p-2 rounded-xl hover:bg-slate-50 transition-all cursor-pointer"
+                                        title="Editar lista"
+                                    >
+                                        <mat-icon
+                                            class="text-xl! w-auto! h-auto!"
+                                            >edit</mat-icon
+                                        >
+                                    </button>
+                                    <button
+                                        (click)="abrirModalConfirmacion(item)"
+                                        class="text-slate-400 hover:text-rose-600 p-2 rounded-xl hover:bg-rose-50 transition-all cursor-pointer"
+                                        title="Eliminar lista"
+                                    >
+                                        <mat-icon
+                                            class="text-xl! w-auto! h-auto!"
+                                            >delete</mat-icon
+                                        >
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
 
-                } }
-            </tbody>
-        </table>
+            <div class="block md:hidden divide-y divide-slate-100">
+                @for (item of listas(); track item.id) {
+                <div
+                    class="p-5 flex items-center justify-between gap-4 bg-white active:bg-slate-50 transition-colors"
+                >
+                    <div class="space-y-1 min-w-0 flex-1">
+                        <span
+                            class="font-mono text-[10px] bg-slate-100 text-slate-500 py-0.5 px-2 rounded-md"
+                            >ID: {{ item.id }}</span
+                        >
+                        <h3
+                            class="font-bold text-slate-800 text-base leading-tight truncate"
+                        >
+                            {{ item.name }}
+                        </h3>
+                    </div>
+
+                    <div class="flex items-center gap-1.5 shrink-0">
+                        <button
+                            [routerLink]="['edit', item.id]"
+                            class="text-slate-600 p-3 bg-slate-50 rounded-xl active:bg-slate-100 cursor-pointer"
+                        >
+                            <mat-icon
+                                class="text-xl! w-auto! h-auto! flex items-center justify-center"
+                                >edit</mat-icon
+                            >
+                        </button>
+                        <button
+                            (click)="abrirModalConfirmacion(item)"
+                            class="text-rose-600 p-3 bg-rose-50 rounded-xl active:bg-rose-100 cursor-pointer"
+                        >
+                            <mat-icon
+                                class="text-xl! w-auto! h-auto! flex items-center justify-center"
+                                >delete</mat-icon
+                            >
+                        </button>
+                    </div>
+                </div>
+                }
+            </div>
+
+            @if (listas().length === 0) {
+            <div
+                class="text-center py-16 text-slate-400 bg-white flex flex-col items-center justify-center gap-2"
+            >
+                <mat-icon class="text-4xl! h-auto! w-auto! text-slate-300"
+                    >request_quote</mat-icon
+                >
+                <p class="font-medium text-sm text-slate-500">
+                    No hay listas de precios registradas
+                </p>
+                <span class="text-xs text-slate-400"
+                    >Presiona el botón superior para crear un nuevo
+                    registro.</span
+                >
+            </div>
+            } }
+        </div>
     </div>
 </div>
+
+@if (listaPorEliminar()) {
+<div class="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div
+        class="absolute inset-0 bg-slate-900/40 backdrop-blur-xs transition-opacity animate-fadeIn"
+    ></div>
+
+    <div
+        class="bg-white rounded-2xl border border-slate-200/80 shadow-2xl w-full max-w-md p-6 relative z-10 animate-scaleUp"
+    >
+        <div class="flex items-start gap-4">
+            <div
+                class="w-10 h-10 rounded-xl bg-rose-50 border border-rose-100 flex items-center justify-center shrink-0 text-rose-600"
+            >
+                <mat-icon class="text-xl! w-auto! h-auto!">warning_amber</mat-icon>
+            </div>
+            <div class="space-y-1.5 flex-1 min-w-0">
+                <h2
+                    class="text-base font-extrabold text-slate-900 tracking-tight"
+                >
+                    ¿Eliminar lista de precios?
+                </h2>
+                <p class="text-xs text-slate-400 leading-relaxed">
+                    Estás a punto de eliminar permanentemente la lista:
+                    <span class="font-bold text-slate-800"
+                        >"{{ listaPorEliminar()?.name }}"</span
+                    >. Esta acción no se puede deshacer.
+                </p>
+            </div>
+        </div>
+
+        <div
+            class="flex items-center justify-end gap-2.5 mt-6 border-t border-slate-100 pt-4"
+        >
+            <button
+                (click)="cerrarModal()"
+                type="button"
+                class="px-4 py-2.5 bg-slate-50 hover:bg-slate-100 text-slate-600 rounded-xl text-xs font-bold transition-all cursor-pointer"
+            >
+                Cancelar
+            </button>
+            <button
+                (click)="confirmarEliminar()"
+                type="button"
+                class="px-4 py-2.5 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-bold transition-all shadow-xs active:scale-[0.98] cursor-pointer"
+            >
+                Sí, eliminar
+            </button>
+        </div>
+    </div>
+</div>
+}

@@ -9,8 +9,8 @@ import { Products } from './features/products/products';
 import { ValidCotizacion } from './features/valid-cotizacion/valid-cotizacion';
 import { AdminDashboard } from './features/admin-dashboard/admin-dashboard';
 import { AdminUsers } from './features/admin-users/admin-users';
-import { AdminCustomers } from './features/admin-clientes/admin-clientes';
 import { AdminProducts } from './features/admin-products/admin-products';
+import { AdminCotizaciones } from './features/admin-cotizaciones/admin-cotizaciones';
 
 export const routes: Routes = [
     {
@@ -45,6 +45,12 @@ export const routes: Routes = [
     },
 
     {
+        path: 'valid-cotizacion/:id',
+        component: ValidCotizacion,
+        canActivate: [authAdminGuard],
+    },
+
+    {
         path: 'admin-dashboard',
         component: AdminDashboard,
         canActivate: [authAdminGuard],
@@ -66,14 +72,23 @@ export const routes: Routes = [
     },
 
     {
-        path: 'admin-customers',
-        component: AdminCustomers,
+        path: 'home-clientes',
+        loadChildren: () =>
+            import('./features/admin-clientes/admin-clientes.routes').then(
+                (m) => m.ADMIN_CLIENTES_ROUTES,
+            ),
         canActivate: [authAdminGuard],
     },
 
     {
         path: 'admin-products',
         component: AdminProducts,
+        canActivate: [authAdminGuard],
+    },
+
+    {
+        path: 'admin-cotizaciones',
+        component: AdminCotizaciones,
         canActivate: [authAdminGuard],
     },
 ];

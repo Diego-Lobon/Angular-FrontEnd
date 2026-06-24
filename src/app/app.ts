@@ -5,7 +5,7 @@ import { Navbar } from './shared/components/navbar/navbar';
 import { Footer } from './shared/components/footer/footer';
 import { AdminNavbar } from './shared/components/admin-navbar/admin-navbar';
 
-import { AuthService } from './core/services/auth';
+import { AuthService } from './core/services/auth.service';
 import { AuthClienteService } from './core/services/auth-cliente.service';
 
 @Component({
@@ -23,8 +23,9 @@ export class App {
     private adminRoutes = [
         '/admin-dashboard',
         '/admin-users',
-        '/admin-customers',
+        '/home-clientes',
         '/admin-products',
+        '/admin-cotizaciones',
         '/home-list-price',
         '/valid-cotizacion',
     ];
